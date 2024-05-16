@@ -5,6 +5,7 @@ from rest_framework_simplejwt.tokens import RefreshToken
 
 from apps.common.email import send_email
 from apps.common.utils import OTPUtils
+from .models import Address, Profile, Role
 
 User = get_user_model()
 
@@ -16,10 +17,13 @@ class SignUpSerializer(serializers.ModelSerializer):
 
     password = serializers.CharField(min_length=6, write_only=True)
     password2 = serializers.CharField(min_length=6, write_only=True)
+    referral_code = serializers.CharField(
+        required=False, allow_blank=True, allow_null=True, write_only=True
+    )
 
     class Meta:
         model = User
-        fields = ["id", "email", "name", "password", "password2"]
+        fields = ["id", "email", "username", "password", "password2", "referral_code"]
 
     # Check if passwords match
     def validate_password2(self, password2: str):
@@ -27,10 +31,33 @@ class SignUpSerializer(serializers.ModelSerializer):
             raise serializers.ValidationError("passwords do not match")
         return password2
 
+    def validate(self, attrs):
+        """
+        Take out referral_code to ensure validation does not fail.
+        This is because we dont have referral_code field on user Model
+        """
+        referral_code = attrs.pop("referral_code", None)
+        attrs = super().validate(attrs)
+
+        # Add referral code back to attrs
+        attrs["referral_code"] = referral_code
+        return attrs
+
     def create(self, validated_data: dict):
         # Remove second password field
         _ = validated_data.pop("password2")
-        return User.objects.create_user(**validated_data)
+        referral_code = validated_data.pop("referral_code", None)
+        # Create User
+        user = User.objects.create_user(**validated_data)
+
+        if referral_code:
+            try:
+                profile = Profile.objects.get(referral_code=referral_code)
+                profile.update_referral(5)
+                user.profile.referrer = profile.user
+                user.profile.save(update_fields=["referrer", "updated_at"])
+            except Profile.DoesNotExist:
+                pass
 
 
 class SignupResponseSerializer(serializers.ModelSerializer):
@@ -38,7 +65,7 @@ class SignupResponseSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = User
-        fields = ("id", "name", "email", "token")
+        fields = ("id", "username", "email", "token")
 
     @swagger_serializer_method(
         serializer_or_field=serializers.JSONField(),
@@ -51,7 +78,7 @@ class SignupResponseSerializer(serializers.ModelSerializer):
 class UserSerializer(serializers.ModelSerializer):
     class Meta:
         model = User
-        fields = ["email", "name", "id"]
+        fields = ["email", "username", "id"]
 
 
 class ForgotPasswordSerializer(serializers.Serializer):
@@ -132,3 +159,51 @@ class ChangePasswordSerializer(serializers.Serializer):
         user.save()
 
         return {"old_password": "", "new_password": ""}
+
+
+class RoleSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Role
+        fields = ("id", "name")
+
+
+class AddressSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Address
+        fields = "__all__"
+
+
+class ProfileSerializer(serializers.ModelSerializer):
+    email = serializers.SerializerMethodField()
+    role_name = serializers.SerializerMethodField()
+    address_name = serializers.SerializerMethodField()
+
+    class Meta:
+        model = Profile
+        fields = (
+            "id",
+            "user",
+            "first_name",
+            "last_name",
+            "email",
+            "role",
+            "role_name",
+            "address",
+            "address_name",
+            "gender",
+            "dob",
+            "phone_number",
+            "profile_image",
+        )
+
+
+    def get_email(self, profile) -> str:
+        return profile.user.email if profile.user else ""
+
+    def get_role_name(self, profile) -> str:
+        return profile.role.name if profile.role else ""
+
+    def get_address_name(self, profile) -> str:
+        return profile.address.address_name if profile.address else ""
+
+
