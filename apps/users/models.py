@@ -4,11 +4,11 @@ from django.contrib.auth.models import (
     PermissionsMixin,
 )
 from django.db import models
-from django.utils.translation import gettext_lazy as _
 from django.dispatch import receiver
+from django.utils.translation import gettext_lazy as _
 
-from apps.common import models as base_models
 from apps.common import const
+from apps.common import models as base_models
 
 
 class UserManager(BaseUserManager):
@@ -130,7 +130,6 @@ class Profile(base_models.BaseModel):
     class Meta:
         ordering = ("created_at",)
 
-
     def update_referral(self, val):
         self.referral_points += val
         self.save(update_fields=["referral_points", "updated_at"] if self.pk else None)
@@ -139,7 +138,6 @@ class Profile(base_models.BaseModel):
         return self.user.username
 
     def save(self, *args, **kwargs):
-      
         """Generate referral code"""
         if not self.pk or not self.referral_code:
             self.referral_code = self.generate_referral_code()

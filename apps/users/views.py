@@ -5,25 +5,23 @@ from rest_framework import status
 from rest_framework.decorators import action
 from rest_framework.generics import CreateAPIView
 from rest_framework.mixins import ListModelMixin, RetrieveModelMixin, UpdateModelMixin
-from rest_framework.permissions import AllowAny, IsAuthenticated, IsAdminUser
 from rest_framework.parsers import FormParser, MultiPartParser
+from rest_framework.permissions import AllowAny, IsAdminUser, IsAuthenticated
 from rest_framework.response import Response
 from rest_framework.viewsets import GenericViewSet, ModelViewSet
-
 
 from .models import Address, Profile, Role
 from .serializers import (
     AddressSerializer,
     ChangePasswordSerializer,
     ForgotPasswordSerializer,
+    ProfileSerializer,
     ResetPasswordSerializer,
+    RoleSerializer,
     SignupResponseSerializer,
     SignUpSerializer,
     UserSerializer,
-    ProfileSerializer,
-    RoleSerializer,
 )
-
 
 User = get_user_model()
 
@@ -159,4 +157,3 @@ class ProfileView(ModelViewSet):
         if user.is_staff:
             return self.queryset
         return self.queryset.filter(user=user)
-

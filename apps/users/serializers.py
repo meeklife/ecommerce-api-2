@@ -5,6 +5,7 @@ from rest_framework_simplejwt.tokens import RefreshToken
 
 from apps.common.email import send_email
 from apps.common.utils import OTPUtils
+
 from .models import Address, Profile, Role
 
 User = get_user_model()
@@ -58,6 +59,7 @@ class SignUpSerializer(serializers.ModelSerializer):
                 user.profile.save(update_fields=["referrer", "updated_at"])
             except Profile.DoesNotExist:
                 pass
+        return user
 
 
 class SignupResponseSerializer(serializers.ModelSerializer):
@@ -196,7 +198,6 @@ class ProfileSerializer(serializers.ModelSerializer):
             "profile_image",
         )
 
-
     def get_email(self, profile) -> str:
         return profile.user.email if profile.user else ""
 
@@ -205,5 +206,3 @@ class ProfileSerializer(serializers.ModelSerializer):
 
     def get_address_name(self, profile) -> str:
         return profile.address.address_name if profile.address else ""
-
-
