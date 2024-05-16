@@ -5,8 +5,10 @@ from django.contrib.auth.models import (
 )
 from django.db import models
 from django.utils.translation import gettext_lazy as _
+from django.dispatch import receiver
 
 from apps.common import models as base_models
+from apps.common import const
 
 
 class UserManager(BaseUserManager):
@@ -42,7 +44,7 @@ class User(PermissionsMixin, base_models.BaseModel, AbstractBaseUser):
 
     email = models.EmailField(unique=True, max_length=255, blank=False, null=False)
     #: First and last name do not cover name patterns around the globe
-    name = models.CharField(_("Name of User"), blank=True, max_length=255)
+    username = models.CharField(_("Username"), unique=True, blank=True, max_length=255)
     is_staff = models.BooleanField(
         _("staff status"),
         default=False,
@@ -58,7 +60,7 @@ class User(PermissionsMixin, base_models.BaseModel, AbstractBaseUser):
 
     USERNAME_FIELD = "email"
     EMAIL_FIELD = "email"
-    REQUIRED_FIELDS = ["name"]
+    REQUIRED_FIELDS = ["username"]
 
     def get_full_name(self):
         return self.name
@@ -68,3 +70,90 @@ class User(PermissionsMixin, base_models.BaseModel, AbstractBaseUser):
 
     def __str__(self) -> str:
         return self.get_full_name() or self.email
+
+
+class Role(base_models.BaseModel):
+    name = models.CharField(max_length=50, unique=True)
+
+    class Meta:
+        ordering = ("created_at",)
+
+    def __str__(self):
+        return self.name
+
+
+class Address(base_models.BaseModel):
+    user = models.ForeignKey(User, on_delete=models.CASCADE, related_name="addresses")
+    address_name = models.CharField(max_length=50)
+    street_name = models.CharField(max_length=50, blank=True)
+    address = models.CharField(max_length=50)
+    city = models.CharField(max_length=50, blank=True)
+    town = models.CharField(max_length=50, blank=True)
+    country = models.CharField(max_length=50, blank=True)
+    lat = models.DecimalField(max_digits=11, decimal_places=8, default=0)
+    lon = models.DecimalField(max_digits=11, decimal_places=8, default=0)
+
+    class Meta:
+        ordering = ("created_at",)
+
+    def __str__(self):
+        return f"{self.user.name}::{self.address_name}"
+
+
+class Profile(base_models.BaseModel):
+    class Gender(models.TextChoices):
+        MALE = "m", "Male"
+        FEMALE = "f", "Female"
+        OTHER = "o", "Other"
+
+    user = models.OneToOneField(User, on_delete=models.CASCADE, related_name="profile")
+    role = models.ForeignKey(Role, on_delete=models.SET_NULL, null=True)
+    first_name = models.CharField(_("First Name"), blank=True, max_length=255)
+    last_name = models.CharField(_("Last Name"), blank=True, max_length=255)
+    address = models.ForeignKey(
+        Address, on_delete=models.SET_NULL, blank=True, null=True
+    )
+    gender = models.CharField(max_length=2, choices=Gender.choices)
+    dob = models.DateField(null=True, blank=True)
+    phone_number = models.CharField(max_length=25, blank=True)
+    profile_image = models.ImageField(upload_to="profile", blank=True, null=True)
+    referral_points = models.PositiveIntegerField(default=0)
+    referral_code = models.CharField(max_length=254, blank=True, null=True)
+    referrer = models.ForeignKey(
+        "users.User",
+        on_delete=models.CASCADE,
+        related_name="referrals",
+        null=True,
+        blank=True,
+    )
+
+    class Meta:
+        ordering = ("created_at",)
+
+
+    def update_referral(self, val):
+        self.referral_points += val
+        self.save(update_fields=["referral_points", "updated_at"] if self.pk else None)
+
+    def generate_referral_code(self):
+        return self.user.username
+
+    def save(self, *args, **kwargs):
+      
+        """Generate referral code"""
+        if not self.pk or not self.referral_code:
+            self.referral_code = self.generate_referral_code()
+
+        return super().save(*args, **kwargs)
+
+    def __str__(self):
+        return f"{self.user.username}'s profile"
+
+
+# SIGNALS
+# ---------------------------------------------------
+@receiver(models.signals.post_save, sender=User)
+def create_profile(sender, instance, created, **kwargs):
+    if created:
+        role, _ = Role.objects.get_or_create(name=const.USER_ROLE)
+        Profile.objects.create(user=instance, role=role)

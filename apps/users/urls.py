@@ -8,10 +8,17 @@ from .views import (
     ResetPasswordView,
     SignUpView,
     UserView,
+    RoleView,
+    AddressView,
+    ProfileView
 )
 
 router = DefaultRouter()
 
+
+router.register("role", RoleView, basename="role")
+router.register("address", AddressView, basename="address")
+router.register("profile", ProfileView, basename="profile")
 router.register("users", UserView, basename="users")
 
 

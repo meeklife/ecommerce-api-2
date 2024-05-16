@@ -45,13 +45,13 @@ schema_view = get_schema_view(
 # U can also use django.contrib.admin.views.decorators.staff_member_required()
 # -------------------------------------------------------------------------------------
 # Redoc Schema
-@staff_member_required(login_url="/login/")
+# @staff_member_required(login_url="/login/")
 def redoc(request):
     return schema_view.with_ui("redoc", cache_timeout=0)(request)
 
 
 # Swagger Schema
-@staff_member_required(login_url="/login/")
+# @staff_member_required(login_url="/login/")
 def swagger(request):
     return schema_view.with_ui("swagger", cache_timeout=0)(request)
 
