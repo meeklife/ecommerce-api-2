@@ -53,6 +53,7 @@ class UserAdmin(auth_admin.UserAdmin):
     search_fields = ["username", "email", "id"]
     ordering = ("email",)
 
+
 admin.site.register(Role)
 admin.site.register(Profile)
 admin.site.register(Address)

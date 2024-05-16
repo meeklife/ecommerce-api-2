@@ -16,7 +16,8 @@ Including another URLconf
 """
 from django.conf import settings
 from django.contrib import admin
-from django.contrib.admin.views.decorators import staff_member_required
+
+# from django.contrib.admin.views.decorators import staff_member_required
 from django.contrib.auth import views as auth_views
 from django.urls import include, path
 from django.views.generic import TemplateView
