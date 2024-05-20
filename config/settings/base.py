@@ -58,7 +58,11 @@ THIRD_PARTY_APPS = [
     "drf_yasg",
 ]
 
-LOCAL_APPS = ["apps.users.apps.UsersConfig", "apps.brands.apps.BrandsConfig"]
+LOCAL_APPS = [
+    "apps.users.apps.UsersConfig",
+    "apps.brands.apps.BrandsConfig",
+    "apps.products.apps.ProductsConfig",
+]
 
 INSTALLED_APPS = DJANGO_APPS + THIRD_PARTY_APPS + LOCAL_APPS
 

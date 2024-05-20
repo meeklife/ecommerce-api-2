@@ -5,4 +5,5 @@ app_name = "api"
 urlpatterns = [
     path("brands/", include("apps.brands.urls")),
     path("", include("apps.users.urls")),
+    path("product-category/", include("apps.products.urls")),
 ]
