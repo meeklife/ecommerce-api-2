@@ -4,6 +4,6 @@ from .views import ProductCategoryView
 
 router = DefaultRouter()
 
-router.register("", ProductCategoryView, basename="product-category")
+router.register("category", ProductCategoryView, basename="category")
 
 urlpatterns = router.urls
