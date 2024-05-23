@@ -11,11 +11,9 @@ class ProductCategorySerializer(serializers.ModelSerializer):
 
 
 class ProductSerializer(serializers.ModelSerializer):
-    brand = serializers.PrimaryKeyRelatedField(
-        queryset=Brand.objects.all(), write_only=True
-    )
+    brand = serializers.PrimaryKeyRelatedField(queryset=Brand.objects.all())
     category = serializers.PrimaryKeyRelatedField(
-        queryset=ProductCategory.objects.all(), write_only=True
+        queryset=ProductCategory.objects.all()
     )
     brand_name = serializers.SerializerMethodField(read_only=True)
     category_name = serializers.SerializerMethodField(read_only=True)
