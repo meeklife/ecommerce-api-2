@@ -1,7 +1,8 @@
 from rest_framework import serializers
 
 from ..brands.models import Brand
-from .models import ProductCategory, ProductImage, Products
+from ..users.models import User
+from .models import Favorite, ProductCategory, ProductImage, Products
 
 
 class ProductCategorySerializer(serializers.ModelSerializer):
@@ -40,3 +41,14 @@ class ProductImageSerializer(serializers.ModelSerializer):
     class Meta:
         model = ProductImage
         fields = ["id", "product", "product_name", "product_image"]
+
+
+class FavoriteSerializer(serializers.ModelSerializer):
+    product = serializers.PrimaryKeyRelatedField(queryset=Products.objects.all())
+    user = serializers.PrimaryKeyRelatedField(queryset=User.objects.all())
+
+    product_name = serializers.CharField(source="product.name", read_only=True)
+
+    class Meta:
+        model = Favorite
+        fields = ["id", "product", "product_name", "user"]
