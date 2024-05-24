@@ -7,7 +7,7 @@ from ..users.serializers import UserSerializer
 from .models import ProductReview
 
 
-class ProductReviewSerializer(serializers.Serializer):
+class ProductReviewSerializer(serializers.ModelSerializer):
     product = serializers.PrimaryKeyRelatedField(queryset=Products.objects.all())
     user = serializers.PrimaryKeyRelatedField(queryset=User.objects.all())
     user_details = UserSerializer(source="user", read_only=True)
@@ -15,4 +15,12 @@ class ProductReviewSerializer(serializers.Serializer):
 
     class Meta:
         model = ProductReview
-        fields = ["id", "user", "user_name", "product_name", "product"]
+        fields = [
+            "id",
+            "user",
+            "user_details",
+            "product_details",
+            "product",
+            "rating",
+            "description",
+        ]
