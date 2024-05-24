@@ -1,3 +1,18 @@
-# from django.shortcuts import render
+from rest_framework.permissions import AllowAny, IsAuthenticated
+from rest_framework.viewsets import ModelViewSet
 
-# Create your views here.
+from .models import ProductReview
+from .serializers import ProductReviewSerializer
+
+
+class ProductReviewView(ModelViewSet):
+    queryset = ProductReview.objects.all()
+    serializer_class = ProductReviewSerializer
+    permission_classes = [AllowAny]
+
+    http_method_names = [m for m in ModelViewSet.http_method_names if m not in ["put"]]
+
+    def get_permissions(self):
+        if self.action in ["create", "update", "partial_update", "destroy"]:
+            self.permission_classes = [IsAuthenticated]
+        return super().get_permissions()
