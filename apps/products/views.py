@@ -1,8 +1,12 @@
 from rest_framework.permissions import AllowAny, IsAdminUser
 from rest_framework.viewsets import ModelViewSet
 
-from .models import ProductCategory, Products
-from .serializers import ProductCategorySerializer, ProductSerializer
+from .models import ProductCategory, ProductImage, Products
+from .serializers import (
+    ProductCategorySerializer,
+    ProductImageSerializer,
+    ProductSerializer,
+)
 
 
 class ProductCategoryView(ModelViewSet):
@@ -21,6 +25,19 @@ class ProductCategoryView(ModelViewSet):
 class ProductView(ModelViewSet):
     queryset = Products.objects.all()
     serializer_class = ProductSerializer
+    permission_classes = [AllowAny]
+
+    http_method_names = [m for m in ModelViewSet.http_method_names if m not in ["put"]]
+
+    def get_permissions(self):
+        if self.action in ["create", "update", "partial_update", "destroy"]:
+            self.permission_classes = [IsAdminUser]
+        return super().get_permissions()
+
+
+class ProductImageView(ModelViewSet):
+    queryset = ProductImage.objects.all()
+    serializer_class = ProductImageSerializer
     permission_classes = [AllowAny]
 
     http_method_names = [m for m in ModelViewSet.http_method_names if m not in ["put"]]

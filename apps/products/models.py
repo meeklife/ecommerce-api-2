@@ -33,3 +33,11 @@ class Products(base_models.BaseModel):
 
     def __str__(self):
         return self.name
+
+
+class ProductImage(base_models.BaseModel):
+    product = models.ForeignKey(Products, on_delete=models.CASCADE)
+    product_image = models.ImageField(upload_to="product_images/")
+
+    class Meta:
+        ordering = ("created_at",)
