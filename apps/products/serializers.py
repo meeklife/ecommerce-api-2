@@ -1,7 +1,8 @@
 from rest_framework import serializers
 
 from ..brands.models import Brand
-from .models import ProductCategory, Products
+from ..users.models import User
+from .models import Favorite, ProductCategory, ProductImage, Products
 
 
 class ProductCategorySerializer(serializers.ModelSerializer):
@@ -15,8 +16,8 @@ class ProductSerializer(serializers.ModelSerializer):
     category = serializers.PrimaryKeyRelatedField(
         queryset=ProductCategory.objects.all()
     )
-    brand_name = serializers.SerializerMethodField(read_only=True)
-    category_name = serializers.SerializerMethodField(read_only=True)
+    brand_name = serializers.CharField(source="brand.name", read_only=True)
+    category_name = serializers.CharField(source="category.name", read_only=True)
 
     class Meta:
         model = Products
@@ -32,8 +33,22 @@ class ProductSerializer(serializers.ModelSerializer):
             "category_name",
         ]
 
-    def get_brand_name(self, product) -> str:
-        return product.brand.name if product.brand else ""
 
-    def get_category_name(self, product) -> str:
-        return product.category.name if product.category else ""
+class ProductImageSerializer(serializers.ModelSerializer):
+    product = serializers.PrimaryKeyRelatedField(queryset=Products.objects.all())
+    product_name = serializers.CharField(source="product.name", read_only=True)
+
+    class Meta:
+        model = ProductImage
+        fields = ["id", "product", "product_name", "product_image"]
+
+
+class FavoriteSerializer(serializers.ModelSerializer):
+    product = serializers.PrimaryKeyRelatedField(queryset=Products.objects.all())
+    user = serializers.PrimaryKeyRelatedField(queryset=User.objects.all())
+
+    product_name = serializers.CharField(source="product.name", read_only=True)
+
+    class Meta:
+        model = Favorite
+        fields = ["id", "product", "product_name", "user"]

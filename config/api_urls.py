@@ -5,5 +5,6 @@ app_name = "api"
 urlpatterns = [
     path("brands/", include("apps.brands.urls")),
     path("products/", include("apps.products.urls")),
+    path("review/", include("apps.reviews.urls")),
     path("", include("apps.users.urls")),
 ]

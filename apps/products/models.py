@@ -3,6 +3,7 @@ from django.db import models
 from apps.common import models as base_models
 
 from ..brands.models import Brand
+from ..users.models import User
 
 
 class ProductCategory(base_models.BaseModel):
@@ -33,3 +34,24 @@ class Products(base_models.BaseModel):
 
     def __str__(self):
         return self.name
+
+
+class ProductImage(base_models.BaseModel):
+    product = models.ForeignKey(Products, on_delete=models.CASCADE)
+    product_image = models.ImageField(upload_to="profile")
+
+    class Meta:
+        ordering = ("created_at",)
+
+
+class Favorite(base_models.BaseModel):
+    product = models.ForeignKey(
+        Products, on_delete=models.CASCADE, related_name="favorites"
+    )
+    user = models.ForeignKey(User, on_delete=models.CASCADE)
+
+    class Meta:
+        ordering = ("created_at",)
+
+    def __str__(self):
+        return f"{self.user} added {self.product} to favorites"
