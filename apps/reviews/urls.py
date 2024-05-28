@@ -4,6 +4,6 @@ from .views import ProductReviewView
 
 router = DefaultRouter()
 
-router.register("review", ProductReviewView, basename="product_review")
+router.register("product", ProductReviewView, basename="product_review")
 
 urlpatterns = router.urls
