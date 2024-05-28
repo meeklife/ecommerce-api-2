@@ -45,7 +45,9 @@ class ProductImage(base_models.BaseModel):
 
 
 class Favorite(base_models.BaseModel):
-    product = models.ForeignKey(Products, on_delete=models.CASCADE)
+    product = models.ForeignKey(
+        Products, on_delete=models.CASCADE, related_name="favorites"
+    )
     user = models.ForeignKey(User, on_delete=models.CASCADE)
 
     class Meta:
