@@ -12,6 +12,7 @@ class ProductCategory(base_models.BaseModel):
 
     class Meta:
         ordering = ("created_at",)
+        verbose_name_plural = "product categories"
 
     def __str__(self):
         return self.name
