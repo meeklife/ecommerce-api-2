@@ -24,3 +24,8 @@ class AppReviewView(ModelViewSet):
     permission_classes = [AllowAny]
 
     http_method_names = [m for m in ModelViewSet.http_method_names if m not in ["put"]]
+
+    def get_permissions(self):
+        if self.action in ["create", "update", "partial_update", "destroy"]:
+            self.permission_classes = [IsAuthenticated]
+        return super().get_permissions()
