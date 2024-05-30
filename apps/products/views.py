@@ -1,7 +1,7 @@
 from rest_framework.permissions import AllowAny, IsAdminUser, IsAuthenticated
 from rest_framework.viewsets import ModelViewSet
 
-from .models import Favorite, ProductCategory, ProductImage, Products
+from .models import Favorite, Product, ProductCategory, ProductImage
 from .serializers import (
     FavoriteSerializer,
     ProductCategorySerializer,
@@ -24,7 +24,7 @@ class ProductCategoryView(ModelViewSet):
 
 
 class ProductView(ModelViewSet):
-    queryset = Products.objects.all()
+    queryset = Product.objects.all()
     serializer_class = ProductSerializer
     permission_classes = [AllowAny]
 

@@ -2,7 +2,7 @@ from rest_framework import serializers
 
 from ..brands.models import Brand
 from ..users.models import User
-from .models import Favorite, ProductCategory, ProductImage, Products
+from .models import Favorite, Product, ProductCategory, ProductImage
 
 
 class ProductCategorySerializer(serializers.ModelSerializer):
@@ -20,7 +20,7 @@ class ProductSerializer(serializers.ModelSerializer):
     category_name = serializers.CharField(source="category.name", read_only=True)
 
     class Meta:
-        model = Products
+        model = Product
         fields = [
             "id",
             "name",
@@ -35,7 +35,7 @@ class ProductSerializer(serializers.ModelSerializer):
 
 
 class ProductImageSerializer(serializers.ModelSerializer):
-    product = serializers.PrimaryKeyRelatedField(queryset=Products.objects.all())
+    product = serializers.PrimaryKeyRelatedField(queryset=Product.objects.all())
     product_name = serializers.CharField(source="product.name", read_only=True)
 
     class Meta:
@@ -44,7 +44,7 @@ class ProductImageSerializer(serializers.ModelSerializer):
 
 
 class FavoriteSerializer(serializers.ModelSerializer):
-    product = serializers.PrimaryKeyRelatedField(queryset=Products.objects.all())
+    product = serializers.PrimaryKeyRelatedField(queryset=Product.objects.all())
     user = serializers.PrimaryKeyRelatedField(queryset=User.objects.all())
 
     product_name = serializers.CharField(source="product.name", read_only=True)
