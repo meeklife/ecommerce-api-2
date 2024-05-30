@@ -63,6 +63,7 @@ LOCAL_APPS = [
     "apps.brands.apps.BrandsConfig",
     "apps.products.apps.ProductsConfig",
     "apps.reviews.apps.ReviewsConfig",
+    "apps.inventory.apps.InventoryConfig",
 ]
 
 INSTALLED_APPS = DJANGO_APPS + THIRD_PARTY_APPS + LOCAL_APPS
