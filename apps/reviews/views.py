@@ -1,4 +1,4 @@
-from rest_framework.permissions import AllowAny, IsAdminUser
+from rest_framework.permissions import AllowAny, IsAuthenticated
 from rest_framework.viewsets import ModelViewSet
 
 from .models import AppReview, ProductReview
@@ -14,7 +14,7 @@ class ProductReviewView(ModelViewSet):
 
     def get_permissions(self):
         if self.action in ["create", "update", "partial_update", "destroy"]:
-            self.permission_classes = [IsAdminUser]
+            self.permission_classes = [IsAuthenticated]
         return super().get_permissions()
 
 
