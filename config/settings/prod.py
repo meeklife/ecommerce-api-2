@@ -38,11 +38,11 @@ SECURE_CONTENT_TYPE_NOSNIFF = env.bool(
 # STORAGES [django-storages]
 # ------------------------------------------------------------------------------
 INSTALLED_APPS += ["storages"]  # noqa F405
-GS_BUCKET_NAME = env("DJANGO_GCP_STORAGE_BUCKET_NAME")
-GS_DEFAULT_ACL = "publicRead"
-GS_EXPIRATION = timedelta(days=7)
+# GS_BUCKET_NAME = env("DJANGO_GCP_STORAGE_BUCKET_NAME")
+# GS_DEFAULT_ACL = "publicRead"
+# GS_EXPIRATION = timedelta(days=7)
 # Reduce default storage chunck size to stop memory blowups in app engine to 8MB from Default 100MB
-GS_BLOB_CHUNK_SIZE = 8 * 1024 * 1024  # 8MB
+# GS_BLOB_CHUNK_SIZE = 8 * 1024 * 1024  # 8MB
 
 # STATIC
 # ------------------------
@@ -54,8 +54,20 @@ STATIC_ROOT = "static"
 
 # MEDIA
 # ------------------------------------------------------------------------------
-DEFAULT_FILE_STORAGE = "apps.utils.storages.MediaRootGoogleCloudStorage"
-MEDIA_URL = f"https://storage.googleapis.com/{GS_BUCKET_NAME}/media/"
+# DEFAULT_FILE_STORAGE = "apps.utils.storages.MediaRootGoogleCloudStorage"
+# MEDIA_URL = f"https://storage.googleapis.com/{GS_BUCKET_NAME}/media/"
+
+MEDIA_URL = "/media/"
+
+CLOUDINARY_KEY = env("CLOUDINARY_KEY", default="")
+CLOUDINARY_SECRET = env("CLOUDINARY_SECRET", default="")
+CLOUDINARY_NAME = env("CLOUDINARY_NAME", default="")
+
+CLOUDINARY_STORAGE = {
+    "CLOUD_NAME": CLOUDINARY_NAME,
+    "API_SECRET": CLOUDINARY_SECRET,
+    "API_KEY": CLOUDINARY_KEY,
+}
 
 STORAGES = {
     "default": {
