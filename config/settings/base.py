@@ -56,6 +56,8 @@ THIRD_PARTY_APPS = [
     "corsheaders",
     "django_filters",
     "drf_yasg",
+    "cloudinary_storage",
+    "cloudinary",
 ]
 
 LOCAL_APPS = [
