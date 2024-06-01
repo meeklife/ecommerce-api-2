@@ -3,15 +3,22 @@ from rest_framework.routers import DefaultRouter
 from rest_framework_simplejwt.views import TokenObtainPairView, TokenRefreshView
 
 from .views import (
+    AddressView,
     ChangePasswordView,
     ForgotPasswordView,
+    ProfileView,
     ResetPasswordView,
+    RoleView,
     SignUpView,
     UserView,
 )
 
 router = DefaultRouter()
 
+
+router.register("role", RoleView, basename="role")
+router.register("address", AddressView, basename="address")
+router.register("profile", ProfileView, basename="profile")
 router.register("users", UserView, basename="users")
 
 
