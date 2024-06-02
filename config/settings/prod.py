@@ -53,7 +53,7 @@ INSTALLED_APPS += ["storages"]  # noqa F405
 # When hosting on app engine, app.yaml handles static files so no need to serve it from
 # a cloud bucket
 STATIC_URL = "/static/"
-STATIC_ROOT = "static"
+STATIC_ROOT = "staticfiles"
 
 
 # MEDIA
