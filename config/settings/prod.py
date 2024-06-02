@@ -41,7 +41,7 @@ SECURE_CONTENT_TYPE_NOSNIFF = env.bool(
 
 # STORAGES [django-storages]
 # ------------------------------------------------------------------------------
-INSTALLED_APPS += ["storages"]  # noqa F405
+INSTALLED_APPS += ["storages", "cloudinary_storage", "cloudinary"]  # noqa F405
 # GS_BUCKET_NAME = env("DJANGO_GCP_STORAGE_BUCKET_NAME")
 # GS_DEFAULT_ACL = "publicRead"
 # GS_EXPIRATION = timedelta(days=7)
@@ -53,7 +53,7 @@ INSTALLED_APPS += ["storages"]  # noqa F405
 # When hosting on app engine, app.yaml handles static files so no need to serve it from
 # a cloud bucket
 STATIC_URL = "/static/"
-STATIC_ROOT = "staticfiles"
+STATIC_ROOT = "static"
 
 
 # MEDIA
@@ -80,7 +80,8 @@ STORAGES = {
     },
     "staticfiles": {
         # Leave whatever setting you already have here, e.g.:
-        "BACKEND": "django.contrib.staticfiles.storage.StaticFilesStorage",
+        # "BACKEND": "django.contrib.staticfiles.storage.StaticFilesStorage",
+        "BACKEND": 'whitenoise.storage.CompressedManifestStaticFilesStorage',
     },
 }
 

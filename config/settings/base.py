@@ -56,8 +56,6 @@ THIRD_PARTY_APPS = [
     "corsheaders",
     "django_filters",
     "drf_yasg",
-    "cloudinary_storage",
-    "cloudinary",
 ]
 
 LOCAL_APPS = [
@@ -149,6 +147,7 @@ USE_TZ = True
 # https://docs.djangoproject.com/en/4.2/howto/static-files/
 
 STATIC_URL = "static/"
+STATIC_ROOT = "staticfiles"
 
 # Default primary key field type
 # https://docs.djangoproject.com/en/4.2/ref/settings/#default-auto-field
