@@ -3,10 +3,25 @@ from datetime import timedelta
 from .base import *  # noqa
 from .base import env
 
+
 # GENERAL
 # ------------------------------------------------------------------------------
 SECRET_KEY = env("DJANGO_SECRET_KEY")
 ALLOWED_HOSTS = env.list("DJANGO_ALLOWED_HOSTS", default=["example.com"])
+
+
+# MIDDLEWARE
+# ----------------------------------------------------------------------------
+MIDDLEWARE = [
+    "django.middleware.security.SecurityMiddleware",
+    "django.contrib.sessions.middleware.SessionMiddleware",
+    "whitenoise.middleware.WhiteNoiseMiddleware",
+    "django.middleware.common.CommonMiddleware",
+    "django.middleware.csrf.CsrfViewMiddleware",
+    "django.contrib.auth.middleware.AuthenticationMiddleware",
+    "django.contrib.messages.middleware.MessageMiddleware",
+    "django.middleware.clickjacking.XFrameOptionsMiddleware",
+]
 
 
 # DATABASES
@@ -37,7 +52,7 @@ SECURE_CONTENT_TYPE_NOSNIFF = env.bool(
 
 # STORAGES [django-storages]
 # ------------------------------------------------------------------------------
-INSTALLED_APPS += ["storages"]  # noqa F405
+INSTALLED_APPS += ["storages", "cloudinary_storage", "cloudinary"]  # noqa F405
 # GS_BUCKET_NAME = env("DJANGO_GCP_STORAGE_BUCKET_NAME")
 # GS_DEFAULT_ACL = "publicRead"
 # GS_EXPIRATION = timedelta(days=7)
@@ -71,11 +86,13 @@ CLOUDINARY_STORAGE = {
 
 STORAGES = {
     "default": {
-        "BACKEND": "storages.backends.s3boto3.S3Boto3Storage",
+        # "BACKEND": "storages.backends.s3boto3.S3Boto3Storage",
+        "BACKEND": "cloudinary_storage.storage.MediaCloudinaryStorage",
     },
     "staticfiles": {
         # Leave whatever setting you already have here, e.g.:
-        "BACKEND": "django.contrib.staticfiles.storage.StaticFilesStorage",
+        # "BACKEND": "django.contrib.staticfiles.storage.StaticFilesStorage",
+        "BACKEND": 'whitenoise.storage.CompressedManifestStaticFilesStorage',
     },
 }
 
@@ -120,7 +137,7 @@ ANYMAIL = {
 # Collectfast
 # ------------------------------------------------------------------------------
 # https://github.com/antonagestam/collectfast#installation
-INSTALLED_APPS = ["collectfast"] + INSTALLED_APPS  # noqa F405
+# INSTALLED_APPS = ["collectfast"] + INSTALLED_APPS  # noqa F405
 
 # LOGGING
 # ------------------------------------------------------------------------------
