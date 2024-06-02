@@ -3,10 +3,14 @@ from datetime import timedelta
 from .base import *  # noqa
 from .base import env
 
+import logging
+
 # GENERAL
 # ------------------------------------------------------------------------------
 SECRET_KEY = env("DJANGO_SECRET_KEY")
 ALLOWED_HOSTS = env.list("DJANGO_ALLOWED_HOSTS", default=["example.com"])
+logging.debug(env.list("DJANGO_ALLOWED_HOSTS"))
+print(env.list("DJANGO_ALLOWED_HOSTS"))
 
 
 # DATABASES
