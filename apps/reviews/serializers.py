@@ -2,14 +2,13 @@ from rest_framework import serializers
 
 from ..products.models import Product
 from ..products.serializers import ProductSerializer
-from ..users.models import User
 from ..users.serializers import UserSerializer
 from .models import AppReview, ProductReview
 
 
 class ProductReviewSerializer(serializers.ModelSerializer):
     product = serializers.PrimaryKeyRelatedField(queryset=Product.objects.all())
-    user = serializers.PrimaryKeyRelatedField(queryset=User.objects.all())
+    user = serializers.PrimaryKeyRelatedField(read_only=True)
     user_details = UserSerializer(source="user", read_only=True)
     product_details = ProductSerializer(source="product", read_only=True)
 
@@ -27,7 +26,7 @@ class ProductReviewSerializer(serializers.ModelSerializer):
 
 
 class AppReviewSerializer(serializers.ModelSerializer):
-    user = serializers.PrimaryKeyRelatedField(queryset=User.objects.all())
+    user = serializers.PrimaryKeyRelatedField(read_only=True)
     user_details = UserSerializer(source="user", read_only=True)
 
     class Meta:

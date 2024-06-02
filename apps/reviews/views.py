@@ -14,10 +14,8 @@ class ProductReviewView(ModelViewSet):
         m for m in ModelViewSet.http_method_names if m not in ["put", "patch"]
     ]
 
-    # def get_permissions(self):
-    #     if self.action in ["create", "update", "partial_update", "destroy"]:
-    #         self.permission_classes = [IsAuthenticated]
-    #     return super().get_permissions()
+    def perform_create(self, serializer):
+        serializer.save(user=self.request.user)
 
 
 class AppReviewView(ModelViewSet):
@@ -29,7 +27,5 @@ class AppReviewView(ModelViewSet):
         m for m in ModelViewSet.http_method_names if m not in ["put", "patch"]
     ]
 
-    # def get_permissions(self):
-    #     if self.action in ["create", "update", "partial_update", "destroy"]:
-    #         self.permission_classes = [IsAuthenticated]
-    #     return super().get_permissions()
+    def perform_create(self, serializer):
+        serializer.save(user=self.request.user)
