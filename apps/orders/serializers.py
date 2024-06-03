@@ -3,15 +3,7 @@ from rest_framework import serializers
 from apps.inventory.models import Inventory
 from apps.users.models import Address
 
-from .models import Order, OrderItem, Transaction
-
-
-class TransactionSerializer(serializers.ModelSerializer):
-    user = serializers.PrimaryKeyRelatedField(read_only=True)
-
-    class Meta:
-        model = Transaction
-        fields = "__all__"
+from .models import Order, OrderItem
 
 
 class OrderSerializer(serializers.ModelSerializer):
