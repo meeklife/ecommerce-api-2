@@ -44,7 +44,9 @@ class Transaction(base_models.BaseModel):
         ST_POINTS = "SP", _("St_points")
         REFERRAL_POINTS = "RP", _("Referral_points")
 
-    user = models.ForeignKey(usermodels.User, on_delete=models.CASCADE)
+    user = models.ForeignKey(
+        usermodels.User, on_delete=models.CASCADE, related_name="transactions"
+    )
     status = models.CharField(
         max_length=2,
         choices=Transaction_Status.choices,
@@ -81,7 +83,9 @@ class Order(base_models.BaseModel):
         )
         CANCELLED = "CN", _("cancelled")
 
-    user = models.ForeignKey(usermodels.User, on_delete=models.CASCADE)
+    user = models.ForeignKey(
+        usermodels.User, on_delete=models.CASCADE, related_name="orders"
+    )
     ordered = models.BooleanField(default=False)
     status = models.CharField(
         max_length=3, choices=Order_Status.choices, default=Order_Status.DRAFT
@@ -93,7 +97,9 @@ class Order(base_models.BaseModel):
 
 
 class OrderItem(base_models.BaseModel):
-    order = models.ForeignKey(Order, on_delete=models.CASCADE)
-    inventory = models.ForeignKey(Inventory, on_delete=models.CASCADE)
+    order = models.ForeignKey(Order, on_delete=models.CASCADE, related_name="orderItem")
+    inventory = models.ForeignKey(
+        Inventory, on_delete=models.CASCADE, related_name="order_inventory"
+    )
     price = models.DecimalField(max_digits=10, decimal_places=2)
     quantity = models.IntegerField()
