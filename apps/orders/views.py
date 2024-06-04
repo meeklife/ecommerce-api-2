@@ -9,9 +9,7 @@ class Orders(ModelViewSet):
     serializer_class = OrderSerializer
 
     http_method_names = [
-        m
-        for m in ModelViewSet.http_method_names
-        if m not in ["put", "create", "destroy"]
+        m for m in ModelViewSet.http_method_names if m not in ["put", "post", "delete"]
     ]
 
 
@@ -20,7 +18,5 @@ class OrderItems(ModelViewSet):
     serializer_class = OrderItemSerializer
 
     http_method_names = [
-        m
-        for m in ModelViewSet.http_method_names
-        if m not in ["put", "create", "destroy"]
+        m for m in ModelViewSet.http_method_names if m not in ["put", "post", "delete"]
     ]
