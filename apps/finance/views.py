@@ -8,7 +8,8 @@ class Transactions(ModelViewSet):
     queryset = Transaction.objects.all()
     serializer_class = TransactionSerializer
 
-    http_method_names = [m for m in ModelViewSet.http_method_names if m not in ["put"]]
-
-    def perform_create(self, serializer):
-        serializer.save(user=self.request.user)
+    http_method_names = [
+        m
+        for m in ModelViewSet.http_method_names
+        if m not in ["put", "post", "patch", "delete"]
+    ]
