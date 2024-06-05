@@ -1,15 +1,10 @@
-from rest_framework.viewsets import ModelViewSet
+from rest_framework import mixins
+from rest_framework.viewsets import GenericViewSet
 
 from .models import Transaction
 from .serializers import TransactionSerializer
 
 
-class Transactions(ModelViewSet):
+class Transactions(mixins.ListModelMixin, mixins.RetrieveModelMixin, GenericViewSet):
     queryset = Transaction.objects.all()
     serializer_class = TransactionSerializer
-
-    http_method_names = [
-        m
-        for m in ModelViewSet.http_method_names
-        if m not in ["put", "post", "patch", "delete"]
-    ]

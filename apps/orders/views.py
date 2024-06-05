@@ -1,22 +1,25 @@
-from rest_framework.viewsets import ModelViewSet
+from rest_framework import mixins
+from rest_framework.viewsets import GenericViewSet
 
 from .models import Order, OrderItem
 from .serializers import OrderItemSerializer, OrderSerializer
 
 
-class Orders(ModelViewSet):
+class Orders(
+    mixins.UpdateModelMixin,
+    mixins.ListModelMixin,
+    mixins.RetrieveModelMixin,
+    GenericViewSet,
+):
     queryset = Order.objects.all()
     serializer_class = OrderSerializer
 
-    http_method_names = [
-        m for m in ModelViewSet.http_method_names if m not in ["put", "post", "delete"]
-    ]
 
-
-class OrderItems(ModelViewSet):
+class OrderItems(
+    mixins.UpdateModelMixin,
+    mixins.ListModelMixin,
+    mixins.RetrieveModelMixin,
+    GenericViewSet,
+):
     queryset = OrderItem.objects.all()
     serializer_class = OrderItemSerializer
-
-    http_method_names = [
-        m for m in ModelViewSet.http_method_names if m not in ["put", "post", "delete"]
-    ]
