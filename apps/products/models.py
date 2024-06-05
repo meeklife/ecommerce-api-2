@@ -12,12 +12,13 @@ class ProductCategory(base_models.BaseModel):
 
     class Meta:
         ordering = ("created_at",)
+        verbose_name_plural = "product categories"
 
     def __str__(self):
         return self.name
 
 
-class Products(base_models.BaseModel):
+class Product(base_models.BaseModel):
     name = models.CharField(max_length=100)
     description = models.TextField(blank=True)
     specification = models.TextField()
@@ -37,7 +38,7 @@ class Products(base_models.BaseModel):
 
 
 class ProductImage(base_models.BaseModel):
-    product = models.ForeignKey(Products, on_delete=models.CASCADE)
+    product = models.ForeignKey(Product, on_delete=models.CASCADE)
     product_image = models.ImageField(upload_to="profile")
 
     class Meta:
@@ -46,7 +47,7 @@ class ProductImage(base_models.BaseModel):
 
 class Favorite(base_models.BaseModel):
     product = models.ForeignKey(
-        Products, on_delete=models.CASCADE, related_name="favorites"
+        Product, on_delete=models.CASCADE, related_name="favorites"
     )
     user = models.ForeignKey(User, on_delete=models.CASCADE)
 
@@ -54,4 +55,4 @@ class Favorite(base_models.BaseModel):
         ordering = ("created_at",)
 
     def __str__(self):
-        return f"{self.user} added {self.product} to favorites"
+        return f"{self.user.username} added {self.product} to favorites"
