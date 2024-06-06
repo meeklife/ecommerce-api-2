@@ -3,6 +3,8 @@ from .models import Invitation
 from apps.users.models import User 
 
 class InvitationSerializer(serializers.ModelSerializer):
+    user = serializers.ReadOnlyField(source="inviter.name")
+
     class Meta:
         model = Invitation
         fields = [
