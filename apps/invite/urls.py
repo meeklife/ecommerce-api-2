@@ -1,9 +1,9 @@
 from rest_framework.routers import DefaultRouter
 
-from .views import InvitationViewSet
+from .views import InvitationCreateListView
 
 router = DefaultRouter()
 
-router.register(r"invitations", InvitationViewSet, basename="invitation")
+router.register(r"invitations", InvitationCreateListView, basename="")
 
 urlpatterns = router.urls
