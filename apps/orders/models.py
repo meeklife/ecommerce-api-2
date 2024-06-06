@@ -9,26 +9,11 @@ from apps.users import models as usermodels
 
 class Order(base_models.BaseModel):
     class Order_Status(models.TextChoices):
-        DRAFT = (
-            "D",
-            _("Draft"),
-        )
-        PENDING = (
-            "PE",
-            _("Pending"),
-        )
-        PAYMENT_COMPLETE = (
-            "PC",
-            _("Payment Complete"),
-        )
-        IN_DELIVERY = (
-            "IND",
-            _("in-delivery"),
-        )
-        COMPLETE = (
-            "CP",
-            _("complete"),
-        )
+        DRAFT = "D", _("Draft"),
+        PENDING = "PE", _("Pending"),
+        PAYMENT_COMPLETE = "PC", _("Payment Complete"),
+        IN_DELIVERY = "IND", _("in-delivery"),
+        COMPLETE = "CP", _("complete"),
         CANCELLED = "CN", _("cancelled")
 
     user = models.ForeignKey(
@@ -40,8 +25,11 @@ class Order(base_models.BaseModel):
     )
     delivery_cost = models.DecimalField(max_digits=10, decimal_places=2)
     delivery_address = models.ForeignKey(usermodels.Address, on_delete=models.CASCADE)
-    order_date = models.DateTimeField()
+    order_date = models.DateTimeField(auto_now_add=True)
     transaction = models.ForeignKey(Transaction, on_delete=models.CASCADE)
+
+    def __str__(self):
+        return f"{self.user} placed an order"
 
 
 class OrderItem(base_models.BaseModel):

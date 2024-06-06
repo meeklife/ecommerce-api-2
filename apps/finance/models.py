@@ -9,37 +9,16 @@ from apps.users import models as usermodels
 
 class Transaction(base_models.BaseModel):
     class Transaction_Status(models.TextChoices):
-        PENDING = (
-            "PE",
-            _("Pending"),
-        )
-        PAID = (
-            "PA",
-            _("Paid"),
-        )
-        REFUNDED = (
-            "RE",
-            _("Refunded"),
-        )
-        FAILED = (
-            "FA",
-            _("Failed"),
-        )
+        PENDING = "PE", _("Pending"),
+        PAID = "PA", _("Paid"),
+        REFUNDED = "RE", _("Refunded"),
+        FAILED = "FA", _("Failed"),
         CANCELLED = "CA", _("Cancelled")
 
     class Payment_Method(models.TextChoices):
-        CASH = (
-            "CA",
-            _("Cash"),
-        )
-        MOMO = (
-            "MO",
-            _("Momo"),
-        )
-        CARD = (
-            "CD",
-            _("Card"),
-        )
+        CASH = "CA", _("Cash"),
+        MOMO = "MO", _("Momo"),
+        CARD = "CD", _("Card"),
         ST_POINTS = "SP", _("St_points")
         REFERRAL_POINTS = "RP", _("Referral_points")
 
@@ -56,3 +35,6 @@ class Transaction(base_models.BaseModel):
     payment_method = models.CharField(
         max_length=2, choices=Payment_Method.choices, default=Payment_Method.CARD
     )
+
+    def __str__(self):
+        return f"{self.user.username} made a transaction of {self.amount}"
