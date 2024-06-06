@@ -33,6 +33,7 @@ SECRET_KEY = env(
     default="django-insecure-z!2xl-#czs^y#9*tgxyf__7u^-&%!)3zohyh73ndi)_$!pvou=",
 )
 
+
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = False
 
@@ -63,6 +64,7 @@ LOCAL_APPS = [
     "apps.brands.apps.BrandsConfig",
     "apps.products.apps.ProductsConfig",
     "apps.reviews.apps.ReviewsConfig",
+    "apps.invite.apps.InviteConfig",
     "apps.inventory.apps.InventoryConfig",
 ]
 
