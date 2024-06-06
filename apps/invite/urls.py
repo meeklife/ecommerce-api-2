@@ -4,6 +4,6 @@ from .views import InvitationCreateListView
 
 router = DefaultRouter()
 
-router.register(r"invitations", InvitationCreateListView, basename="")
+router.register(r"", InvitationCreateListView, basename="invitation")
 
 urlpatterns = router.urls

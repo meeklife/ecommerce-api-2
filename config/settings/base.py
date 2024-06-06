@@ -65,6 +65,7 @@ LOCAL_APPS = [
     "apps.products.apps.ProductsConfig",
     "apps.reviews.apps.ReviewsConfig",
     "apps.invite.apps.InviteConfig",
+    "apps.inventory.apps.InventoryConfig",
 ]
 
 INSTALLED_APPS = DJANGO_APPS + THIRD_PARTY_APPS + LOCAL_APPS
@@ -148,6 +149,7 @@ USE_TZ = True
 # https://docs.djangoproject.com/en/4.2/howto/static-files/
 
 STATIC_URL = "static/"
+STATIC_ROOT = "staticfiles"
 
 # Default primary key field type
 # https://docs.djangoproject.com/en/4.2/ref/settings/#default-auto-field
