@@ -1,9 +1,6 @@
-from rest_framework.routers import DefaultRouter
-
+from django.urls import path
 from .views import InvitationCreateListView
 
-router = DefaultRouter()
-
-router.register(r"", InvitationCreateListView, basename="invitation")
-
-urlpatterns = router.urls
+urlpatterns = [
+    path(r"", InvitationCreateListView.as_view(), name='invitation'),
+]

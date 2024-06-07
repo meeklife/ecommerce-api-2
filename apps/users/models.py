@@ -97,7 +97,7 @@ class Address(base_models.BaseModel):
         ordering = ("created_at",)
 
     def __str__(self):
-        return f"{self.user.name}::{self.address_name}"
+        return f"{self.user.username}::{self.address_name}"
 
 
 class Profile(base_models.BaseModel):

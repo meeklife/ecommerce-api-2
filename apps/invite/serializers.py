@@ -11,6 +11,7 @@ class InvitationSerializer(serializers.ModelSerializer):
         model = Invitation
         fields = [
             "id",
+            "user",
             "inviter",
             "referral_code",
             "email",
@@ -28,7 +29,5 @@ class InvitationSerializer(serializers.ModelSerializer):
     def create(self, validated_data):
         try:
             return super().create(validated_data)
-        except serializers.ValidationError as e:
-            raise serializers.ValidationError({"email": [str(e)]})
         except Exception as e:
             raise serializers.ValidationError(f"Failed to create invitation: {str(e)}")
