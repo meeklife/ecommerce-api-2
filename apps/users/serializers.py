@@ -51,6 +51,9 @@ class SignUpSerializer(serializers.ModelSerializer):
         # Create User
         user = User.objects.create_user(**validated_data)
 
+        email = validated_data.get("email")
+        send_email("Slightly Techie Registration", "Welcome your registration was successfully", email)
+
         if referral_code:
             try:
                 profile = Profile.objects.get(referral_code=referral_code)
@@ -153,12 +156,17 @@ class ChangePasswordSerializer(serializers.Serializer):
         request = self.context.get("request")
         user: User = request.user
 
+        email = validated_data.get("email")
+
         if not user.check_password(validated_data.get("old_password")):
             raise serializers.ValidationError({"detail": "Incorrect password"})
 
         # reset password
         user.set_password(raw_password=validated_data.get("new_password"))
         user.save()
+
+        send_email("Confirmation of password change",
+                   "Your password for the site has been changed. We are sending you this notice for your protection.", email)
 
         return {"old_password": "", "new_password": ""}
 
