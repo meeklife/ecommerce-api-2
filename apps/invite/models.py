@@ -2,7 +2,6 @@ from django.db import models
 
 from apps.common import email
 from apps.common import models as base_models
-from apps.common import sendEmails
 from apps.users.models import User
 
 

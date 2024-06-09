@@ -100,7 +100,7 @@ class ForgotPasswordSerializer(serializers.Serializer):
             code, token = OTPUtils.generate_otp(user)
 
             # dynamic_data = {"first_name": user.first_name, "verification_code": code}
-            send_email(email, "Password Reset", code)
+            send_email("Password Reset", f"Your password reset code is {code}", email)
 
         return {"token": token}
 
