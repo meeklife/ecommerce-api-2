@@ -1,23 +1,19 @@
 from django.conf import settings
 from django.core.mail import EmailMessage
+from django.core.mail import send_mail
+from config.settings.base import env
 
 
-def send_email(to_email, subject, message, fail_silently=True):
+def send_email(subject, message, recipient, fail_silently=False):
     """
     Helper to send emails system wide.
     Special consideration made for sendgrid's dynamic templating.
 
     https://docs.sendgrid.com/ui/sending-email/how-to-send-an-email-with-dynamic-transactional-templates
     """
-    msg = EmailMessage(
-        subject,
-        message,
-        from_email=settings.DEFAULT_FROM_EMAIL,
-        to=[to_email],
-        reply_to=[settings.DEFAULT_FROM_EMAIL],
+    return send_mail(
+        subject, message, env("FROM_EMAIL"), [recipient], fail_silently=fail_silently
     )
-
-    return msg.send(fail_silently=fail_silently)
 
 
 def send_email_template(

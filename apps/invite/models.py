@@ -19,8 +19,7 @@ class Invitation(base_models.BaseModel):
         # Send email to the invitee
         subject = "You've been invited to join our platform!"
         message = f"Hi, you've been invited to join our platform by {self.inviter.username}! Use the referral code {self.referral_code} to sign up."
-        # email.send_email(self.email, subject, message)
-        sendEmails.send_email(subject, message, self.email)
+        email.send_email(subject, message, self.email)
 
     def __str__(self):
         return f"Invitation from {self.inviter.username} to {self.email}"
