@@ -5,28 +5,34 @@ from config.settings.base import env
 
 
 def send_email(subject, message, recipient, fail_silently=False):
-    return send_mail(
-        subject, message, env("FROM_EMAIL"), [recipient], fail_silently=fail_silently
+    msg = EmailMessage(
+        subject,
+        message,
+        from_email=env("FROM_EMAIL"),
+        to=[recipient],
+        reply_to=[recipient],
     )
 
+    return msg.send(fail_silently=fail_silently)
 
-# def send_email_template(
-#     user, template_id: str, dynamic_template_data: dict = None, fail_silently=True
-# ):
-#     """
-#     Helper to send emails system wide.
-#     Special consideration made for sendgrid's dynamic templating.
 
-#     https://docs.sendgrid.com/ui/sending-email/how-to-send-an-email-with-dynamic-transactional-templates
-#     """
-#     msg = EmailMessage(
-#         from_email=settings.DEFAULT_FROM_EMAIL,
-#         to=[user.email],
-#         reply_to=[settings.DEFAULT_FROM_EMAIL],
-#     )
-#     msg.template_id = template_id
+def send_email_template(
+    email, template_id: str, dynamic_template_data: dict = None, fail_silently=False
+):
+    """
+    Helper to send emails system wide.
+    Special consideration made for sendgrid's dynamic templating.
 
-#     if dynamic_template_data:
-#         msg.dynamic_template_data = dynamic_template_data
+    https://docs.sendgrid.com/ui/sending-email/how-to-send-an-email-with-dynamic-transactional-templates
+    """
+    msg = EmailMessage(
+        from_email=env("FROM_EMAIL"),
+        to=[email],
+        reply_to=[env("FROM_EMAIL")],
+    )
+    msg.template_id = template_id
 
-#     return msg.send(fail_silently=fail_silently)
+    if dynamic_template_data:
+        msg.dynamic_template_data = dynamic_template_data
+
+    return msg.send(fail_silently=fail_silently)
