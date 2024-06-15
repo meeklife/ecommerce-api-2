@@ -1,6 +1,7 @@
 from django.conf import settings
 from django.core.mail import EmailMessage
 from django.core.mail import send_mail
+from anymail.message import AnymailMessage
 from config.settings.base import env
 
 
@@ -17,7 +18,7 @@ def send_email(subject, message, recipient, fail_silently=False):
 
 
 def send_email_template(
-    email, template_id: str, dynamic_template_data: dict = None, fail_silently=False
+    email, template_id: str, dynamic_template_data: dict = None, fail_silently=True
 ):
     """
     Helper to send emails system wide.
@@ -25,7 +26,7 @@ def send_email_template(
 
     https://docs.sendgrid.com/ui/sending-email/how-to-send-an-email-with-dynamic-transactional-templates
     """
-    msg = EmailMessage(
+    msg = AnymailMessage(
         from_email=env("FROM_EMAIL"),
         to=[email],
         reply_to=[env("FROM_EMAIL")],
@@ -33,6 +34,6 @@ def send_email_template(
     msg.template_id = template_id
 
     if dynamic_template_data:
-        msg.dynamic_template_data = dynamic_template_data
+        msg.merge_data = dynamic_template_data
 
     return msg.send(fail_silently=fail_silently)

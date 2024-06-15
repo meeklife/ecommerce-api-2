@@ -10,3 +10,4 @@ django-extensions==3.2.3
 django-debug-toolbar==4.1.0
 nplusone==1.0.0
 pre-commit==3.3.2
+django-anymail==10.3
