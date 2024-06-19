@@ -3,7 +3,7 @@ from drf_yasg.utils import swagger_serializer_method
 from rest_framework import serializers
 from rest_framework_simplejwt.tokens import RefreshToken
 
-from apps.common.email import send_email
+from apps.common.email import send_email, send_email_template
 from apps.common.utils import OTPUtils
 
 from .models import Address, Profile, Role
@@ -50,6 +50,10 @@ class SignUpSerializer(serializers.ModelSerializer):
         referral_code = validated_data.pop("referral_code", None)
         # Create User
         user = User.objects.create_user(**validated_data)
+
+        email = validated_data.get("email")
+        username = validated_data.get("username")
+        send_email_template(email, "d-84ad6c792bf64437bb592b604214806a", {email: {"username": username}})
 
         if referral_code:
             try:
@@ -98,9 +102,8 @@ class ForgotPasswordSerializer(serializers.Serializer):
         email = validated_data.get("email")
         if user := User.objects.filter(email=email).first():
             code, token = OTPUtils.generate_otp(user)
-
-            # dynamic_data = {"first_name": user.first_name, "verification_code": code}
-            send_email(email, "Password Reset", code)
+            send_email_template(email, "d-45557d1b684442b6aef71ae69d50c495",
+                                {email: {"code": code}})
 
         return {"token": token}
 
@@ -136,6 +139,9 @@ class ResetPasswordSerializer(serializers.Serializer):
         # reset password
         user.set_password(raw_password=password)
         user.save()
+        print(user)
+
+        # send_email_template(user.email, "d-e4bf355645044030af3f6fbb6f360153", {user.email: {"username": user.username}})
 
         return {
             "email": user.email,
@@ -151,7 +157,7 @@ class ChangePasswordSerializer(serializers.Serializer):
 
     def create(self, validated_data):
         request = self.context.get("request")
-        user: User = request.user
+        user = request.user
 
         if not user.check_password(validated_data.get("old_password")):
             raise serializers.ValidationError({"detail": "Incorrect password"})
@@ -159,6 +165,8 @@ class ChangePasswordSerializer(serializers.Serializer):
         # reset password
         user.set_password(raw_password=validated_data.get("new_password"))
         user.save()
+
+        send_email_template(user.email, "d-7989ffbb4f114616846ef7ddff10a965", {user.email: {"username": user.username}})
 
         return {"old_password": "", "new_password": ""}
 

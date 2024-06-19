@@ -57,6 +57,7 @@ THIRD_PARTY_APPS = [
     "corsheaders",
     "django_filters",
     "drf_yasg",
+    "anymail",
 ]
 
 LOCAL_APPS = [
