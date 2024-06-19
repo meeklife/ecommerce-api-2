@@ -28,19 +28,8 @@ EMAIL_BACKEND = env(
 )
 ANYMAIL = {
     "SENDGRID_API_KEY": env("SENDGRID_API_KEY"),
-    "EMAIL_HOST": env("EMAIL_HOST"),
-    "EMAIL_HOST_USER": env("EMAIL_HOST_USER"),
-    "EMAIL_HOST_PASSWORD": env("SENDGRID_API_KEY"),
-    "EMAIL_PORT": env("EMAIL_PORT"),
-    "EMAIL_USE_TLS": env("EMAIL_USE_TLS"),
     "SENDGRID_API_URL": env("SENDGRID_API_URL", default="https://api.sendgrid.com/v3/"),
-    # "SENDGRID_API_URL": env("SENDGRID_API_URL", default="https://api.sendgrid.com/v3/mail/send"),
 }
-# EMAIL_HOST = env("EMAIL_HOST")
-# EMAIL_HOST_USER = env("EMAIL_HOST_USER")
-# EMAIL_HOST_PASSWORD = env("SENDGRID_API_KEY")
-# EMAIL_PORT = env("EMAIL_PORT")
-# EMAIL_USE_TLS = env("EMAIL_USE_TLS")
 
 
 # django-debug-toolbar
