@@ -1,18 +1,22 @@
 from rest_framework import serializers
 
 from apps.cart.models import CartItem, ShoppingCart
-from apps.products.serializers import ProductSerializer
+from apps.products.models import Product
+
+
+class ProductSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Product
+        fields = ['id', 'name', 'price']
 
 
 class CartItemSerializer(serializers.ModelSerializer):
-    cart = serializers.PrimaryKeyRelatedField(read_only=True)
-    # product = serializers.PrimaryKeyRelatedField(queryset=Product.objects.all())
-    # product_details = serializers.CharField(source="product", read_only=True)
+    # cart = serializers.PrimaryKeyRelatedField(read_only=True)
     product = ProductSerializer()
 
     class Meta:
-        model: CartItem
-        fields = "_all__"
+        model = CartItem
+        fields = ["id", "product", "price", "quantity"]
 
 
 class ShoppingCartSerializer(serializers.ModelSerializer):

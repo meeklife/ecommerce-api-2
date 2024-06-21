@@ -13,11 +13,10 @@ class ShoppingCart(base_models.BaseModel):
 
 
 class CartItem(base_models.BaseModel):
-    cart = models.ForeignKey(
-        ShoppingCart, on_delete=models.CASCADE, related_name="items"
-    )
-    product = models.ForeignKey(
-        Product, on_delete=models.CASCADE, related_name="cartproduct"
-    )
-    quantity = models.IntegerField()
-    price = models.DecimalField(max_digits=10, decimal_places=2)
+    cart = models.ForeignKey(ShoppingCart, on_delete=models.CASCADE, related_name="items")
+    product = models.ForeignKey(Product, on_delete=models.CASCADE)
+    quantity = models.PositiveIntegerField(default=1)
+    price = models.DecimalField(max_digits=10, decimal_places=2, null=True)
+
+    def __str__(self):
+        return f"{self.quantity} of {self.product.name} has been added to the {self.cart.id}"
