@@ -69,6 +69,7 @@ LOCAL_APPS = [
     "apps.inventory.apps.InventoryConfig",
     "apps.orders.apps.OrdersConfig",
     "apps.finance.apps.FinanceConfig",
+    "apps.cart.apps.CartConfig",
 ]
 
 INSTALLED_APPS = DJANGO_APPS + THIRD_PARTY_APPS + LOCAL_APPS
