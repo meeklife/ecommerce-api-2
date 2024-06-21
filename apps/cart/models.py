@@ -1,7 +1,8 @@
 from django.db import models
+
 from apps.common import models as base_models
-from apps.users.models import User
 from apps.products.models import Product
+from apps.users.models import User
 
 
 class ShoppingCart(base_models.BaseModel):
@@ -12,7 +13,11 @@ class ShoppingCart(base_models.BaseModel):
 
 
 class CartItem(base_models.BaseModel):
-    cart = models.ForeignKey(ShoppingCart, on_delete=models.CASCADE, related_name="items")
-    product = models.ForeignKey(Product, on_delete=models.CASCADE, related_name="cartproduct")
+    cart = models.ForeignKey(
+        ShoppingCart, on_delete=models.CASCADE, related_name="items"
+    )
+    product = models.ForeignKey(
+        Product, on_delete=models.CASCADE, related_name="cartproduct"
+    )
     quantity = models.IntegerField()
     price = models.DecimalField(max_digits=10, decimal_places=2)

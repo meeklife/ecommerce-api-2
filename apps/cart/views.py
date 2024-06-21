@@ -1,6 +1,7 @@
 from django.shortcuts import render
 from rest_framework.viewsets import ModelViewSet
-from apps.cart.models import ShoppingCart, CartItem
+
+from apps.cart.models import CartItem, ShoppingCart
 from apps.cart.serializers import CartItemSerializer, ShoppingCartSerializer
 
 
