@@ -19,4 +19,4 @@ class CartItem(base_models.BaseModel):
     price = models.DecimalField(max_digits=10, decimal_places=2, null=True)
 
     def __str__(self):
-        return f"{self.quantity} of {self.product.name} has been added to the {self.cart.id}"
+        return f"{self.quantity} quantity of {self.product.name} at the price of {self.price} has been added to the cart of {self.cart.user.username}"

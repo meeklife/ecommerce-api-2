@@ -12,6 +12,8 @@ from apps.products.models import Product
 class ShoppingCartViewSet(ModelViewSet):
     serializer_class = ShoppingCartSerializer
 
+    http_method_names = [m for m in ModelViewSet.http_method_names if m not in ["put", "patch"]]
+
     def get_queryset(self):
         return ShoppingCart.objects.filter(user=self.request.user)
 
