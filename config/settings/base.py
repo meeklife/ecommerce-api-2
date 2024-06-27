@@ -69,6 +69,7 @@ LOCAL_APPS = [
     "apps.inventory.apps.InventoryConfig",
     "apps.orders.apps.OrdersConfig",
     "apps.finance.apps.FinanceConfig",
+    "apps.cart.apps.CartConfig",
 ]
 
 INSTALLED_APPS = DJANGO_APPS + THIRD_PARTY_APPS + LOCAL_APPS
@@ -186,8 +187,8 @@ LOGGING = {
 # -------------------------------------------------------------------------------
 # django-rest-framework - https://www.django-rest-framework.org/api-guide/settings/
 REST_FRAMEWORK = {
-    "DEFAULT_PAGINATION_CLASS": "apps.common.pagination.DefaultPagination",
-    "PAGE_SIZE": 20,
+    "DEFAULT_PAGINATION_CLASS": "rest_framework.pagination.PageNumberPagination",
+    "PAGE_SIZE": 25,
     "DEFAULT_AUTHENTICATION_CLASSES": (
         "rest_framework_simplejwt.authentication.JWTAuthentication",
     ),
