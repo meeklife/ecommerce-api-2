@@ -5,8 +5,7 @@ from rest_framework import status
 from rest_framework.response import Response
 
 from apps.cart.models import CartItem, ShoppingCart
-from apps.cart.serializers import CartItemSerializer, ShoppingCartSerializer
-from apps.products.models import Product
+from apps.cart.serializers import CartItemSerializer, ShoppingCartSerializer, AddToCartSerializer
 
 
 class ShoppingCartViewSet(ModelViewSet):
@@ -21,29 +20,28 @@ class ShoppingCartViewSet(ModelViewSet):
         obj, created = ShoppingCart.objects.get_or_create(user=self.request.user)
         return obj
 
-    @action(detail=False, methods=['post'], url_path='add/(?P<product_id>[^/.]+)')
-    def add_to_cart(self, request, product_id=None):
-        try:
-            product = Product.objects.get(id=product_id)
+    def get_serializer_class(self):
+        if self.action == "add_to_cart":
+            self.serializer_class = AddToCartSerializer
+        return super().get_serializer_class()
 
-        except Product.DoesNotExist:
-            return Response({"detail": "Product not found."}, status=status.HTTP_404_NOT_FOUND)
+    @action(detail=False, methods=['post'], url_path='add')
+    def add_to_cart(self, request):
+        serializer = AddToCartSerializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+
+        product = serializer.validated_data.get("product")
+        quantity = serializer.validated_data.get('quantity')
 
         cart = self.get_object()
 
-        cart_item, created = CartItem.objects.get_or_create(cart=cart, product=product)
-
-        if not created:
-            cart_item.quantity += 1
-            cart_item.price += product.price
-        else:
-            cart_item.quantity = 1
-            cart_item.price = product.price
-
+        cart_item, _ = CartItem.objects.get_or_create(cart=cart, product=product)
+        cart_item.quantity = quantity
+        cart_item.price = product.price * quantity
         cart_item.save()
 
-        serializer = CartItemSerializer(cart_item)
-        return Response(serializer.data, status=status.HTTP_201_CREATED)
+        response_data = CartItemSerializer(cart_item)
+        return Response(response_data.data, status=status.HTTP_201_CREATED)
 
     @action(detail=False, methods=['delete'], url_path='remove/(?P<item_id>[^/.]+)')
     def remove_from_cart(self, request, item_id=None):

@@ -19,3 +19,12 @@ class ShoppingCartSerializer(serializers.ModelSerializer):
     class Meta:
         model = ShoppingCart
         fields = ["id", "user", "items"]
+
+
+class AddToCartSerializer(serializers.ModelSerializer):
+    product = serializers.PrimaryKeyRelatedField(queryset=Product.objects.all())
+    quantity = serializers.IntegerField(min_value=1, default=1)
+
+    class Meta:
+        model = CartItem
+        fields = ["id", "product", "quantity"]
