@@ -30,13 +30,12 @@ class OrderViewSet(ModelViewSet):
     @transaction.atomic
     def checkout(self, request):
         cart = ShoppingCart.objects.filter(user=request.user).first()
-        cart_items = CartItem.objects.filter(cart=cart.id)
-        if not cart_items:
+        if not cart:
             return Response({"detail": "Cart is empty"}, status=status.HTTP_400_BAD_REQUEST)
+        cart_items = CartItem.objects.filter(cart=cart.id)
 
         total_amount = sum(item.product.price * item.quantity for item in cart_items)
         delivery_cost = 10
-
         user_address = Address.objects.filter(user=request.user).first()
 
         order = Order.objects.create(
