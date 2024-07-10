@@ -13,4 +13,6 @@ class Transactions(mixins.ListModelMixin, mixins.RetrieveModelMixin, GenericView
         user = self.request.user
         if user.is_superuser:
             return self.queryset
-        return Transaction.objects.filter(user=user)
+        if user.is_authenticated:
+            return Transaction.objects.filter(user=user)
+        return Transaction.objects.none()

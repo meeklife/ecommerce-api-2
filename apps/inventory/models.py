@@ -6,9 +6,7 @@ from ..products.models import Product
 
 
 class Inventory(base_models.BaseModel):
-    product = models.ForeignKey(
-        Product, on_delete=models.CASCADE, related_name="inventory"
-    )
+    product = models.OneToOneField(Product, on_delete=models.CASCADE)
     quantity = models.IntegerField()
     price = models.DecimalField(max_digits=10, decimal_places=2)
     original_price = models.DecimalField(max_digits=10, decimal_places=2)
