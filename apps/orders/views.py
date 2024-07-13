@@ -94,6 +94,6 @@ class OrderItemViewset(ModelViewSet):
         order_id = self.request.query_params.get('order_id')
         queryset = self.get_queryset()
         if order_id:
-            queryset = queryset.filter(order_id=order_id)
+            queryset = self.queryset.filter(order_id=order_id)
         serializer = self.get_serializer(queryset, many=True)
         return Response(serializer.data)
