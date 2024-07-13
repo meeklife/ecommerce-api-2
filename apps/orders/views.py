@@ -2,7 +2,7 @@ from rest_framework import status
 from rest_framework.decorators import action
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
-from rest_framework.viewsets import ModelViewSet
+from rest_framework.viewsets import ModelViewSet, ReadOnlyModelViewSet
 from django.db import transaction
 
 from apps.cart.models import CartItem, ShoppingCart
@@ -55,6 +55,7 @@ class OrderViewSet(ModelViewSet):
             )
 
         serializer = self.get_serializer(order)
+        ShoppingCart.objects.filter(user=request.user).delete()
         return Response(serializer.data, status=status.HTTP_201_CREATED)
 
     @action(detail=True, methods=['post'])
@@ -76,8 +77,23 @@ class OrderViewSet(ModelViewSet):
             order.status = 'PC'
             order.save()
 
-            ShoppingCart.objects.filter(user=request.user).delete()
-
             return Response({"detail": "Payment successful"}, status=status.HTTP_200_OK)
         else:
             return Response({"detail": "Payment failed"}, status=status.HTTP_400_BAD_REQUEST)
+
+
+class OrderItemViewset(ModelViewSet):
+    queryset = OrderItem.objects.all()
+    serializer_class = OrderItemSerializer
+
+    http_method_names = [
+        m for m in ModelViewSet.http_method_names if m not in ["put", "patch", "post", "delete"]
+    ]
+
+    def list(self, request, *args, **kwargs):
+        order_id = self.request.query_params.get('order_id')
+        queryset = self.get_queryset()
+        if order_id:
+            queryset = queryset.filter(order_id=order_id)
+        serializer = self.get_serializer(queryset, many=True)
+        return Response(serializer.data)
