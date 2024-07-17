@@ -8,6 +8,7 @@ from apps.common.utils import OTPUtils
 
 from .models import Address, Profile, Role
 
+
 User = get_user_model()
 
 
@@ -51,9 +52,11 @@ class SignUpSerializer(serializers.ModelSerializer):
         # Create User
         user = User.objects.create_user(**validated_data)
 
+        #new
+        code, _ = OTPUtils.generate_otp(user)
         email = validated_data.get("email")
         username = validated_data.get("username")
-        send_email_template(email, "d-84ad6c792bf64437bb592b604214806a", {email: {"username": username}})
+        send_email_template(email, "d-84ad6c792bf64437bb592b604214806a", {email: {"username": username, "otp":code}})
 
         if referral_code:
             try:
@@ -64,6 +67,33 @@ class SignUpSerializer(serializers.ModelSerializer):
             except Profile.DoesNotExist:
                 pass
         return user
+
+# new    
+class OTPVerifySerializer(serializers.Serializer):
+    email = serializers.EmailField(required=True)
+    code = serializers.CharField(min_length=6, required=True)
+
+    def create(self, data):
+        email = data.get("email")
+        code = data.get("code")
+
+        user = User.objects.filter(email = email).first()
+        if not user:
+            raise serializers.ValidationError("User not found")
+
+        # Verify OTP
+        if not OTPUtils.verify_otp(code, user.otp_secret):
+            raise serializers.ValidationError("Invalid OTP code")
+
+        # Verify user
+        user.is_verified = True
+        user.otp_secret = ""
+        user.save()
+
+        return user
+    
+
+
 
 
 class SignupResponseSerializer(serializers.ModelSerializer):
@@ -76,7 +106,7 @@ class SignupResponseSerializer(serializers.ModelSerializer):
     @swagger_serializer_method(
         serializer_or_field=serializers.JSONField(),
     )
-    def get_token(self, user: User):
+    def get_token(self, user: User): # type: ignore
         refresh = RefreshToken.for_user(user)
         return {"refresh": str(refresh), "access": str(refresh.access_token)}
 
