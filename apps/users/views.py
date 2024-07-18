@@ -9,12 +9,15 @@ from rest_framework.parsers import FormParser, MultiPartParser
 from rest_framework.permissions import AllowAny, IsAdminUser, IsAuthenticated
 from rest_framework.response import Response
 from rest_framework.viewsets import GenericViewSet, ModelViewSet
-
+from rest_framework.views import APIView
+from apps.common.email import send_email
+from apps.common.utils import OTPUtils
 from .models import Address, Profile, Role
 from .serializers import (
     AddressSerializer,
     ChangePasswordSerializer,
     ForgotPasswordSerializer,
+    OTPVerifySerializer,
     ProfileSerializer,
     ResetPasswordSerializer,
     RoleSerializer,
@@ -157,3 +160,39 @@ class ProfileView(ModelViewSet):
         if user.is_staff:
             return self.queryset
         return self.queryset.filter(user=user)
+
+# view for verifying otp
+class OTPVerifyView(CreateAPIView):
+    serializer_class = OTPVerifySerializer
+    permission_classes = [IsAuthenticated]
+
+    @swagger_auto_schema(responses={200: response_schema})
+    def create(self, request, *args, **kwargs):
+        serializer = self.get_serializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+        serializer.save()
+
+        return Response({"message": "Email verified successfully"}, status=status.HTTP_200_OK)
+    
+
+
+class EmailVerification(APIView):
+    
+    permission_classes = [IsAuthenticated]
+
+    def get(self, request):
+
+        user = request.user
+        code, _ = OTPUtils.generate_otp(user)
+
+        recipient =user.email
+
+        subject = "Email Verification Code"
+        message =f"Your email verification code is {code}"
+
+         
+        send_email(subject, message, recipient)
+        return Response("OK")
+
+    
+
