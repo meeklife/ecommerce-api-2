@@ -36,6 +36,9 @@ class UserManager(BaseUserManager):
 
 class User(PermissionsMixin, base_models.BaseModel, AbstractBaseUser):
     """Default user for api_project."""
+    class MemberType(models.TextChoices):
+        SLIGHTLY_TECHIE = "ST", _("Techie")
+        NON_SLIGHTLY_TECHIE = "NT", _("Non_Techie")
 
     # class Roles(models.TextChoices):
     #     MANAGER = "manager", _("Manager")
@@ -51,9 +54,10 @@ class User(PermissionsMixin, base_models.BaseModel, AbstractBaseUser):
         help_text=_("Designates whether the user can log into the admin site"),
     )
     # role = models.CharField(max_length=25, choices=Roles.choices, default=Roles.USER)
-    is_verified = models.BooleanField(default=False) #new
+    is_verified = models.BooleanField(default=False)  # new
     deleted = models.BooleanField(default=False)
-    otp_secret =models.CharField(max_length =100, null = True, blank = True)
+    otp_secret = models.CharField(max_length=100, null=True, blank=True)
+    member_type = models.CharField(max_length=3, choices=MemberType.choices)
 
     objects = UserManager()
 

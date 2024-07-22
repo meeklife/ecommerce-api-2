@@ -5,6 +5,7 @@ from rest_framework_simplejwt.tokens import RefreshToken
 
 from apps.common.email import send_email, send_email_template
 from apps.common.utils import OTPUtils
+from apps.users.utils import query_community_endpoint
 
 from .models import Address, Profile, Role
 
@@ -25,7 +26,7 @@ class SignUpSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = User
-        fields = ["id", "email", "username", "password", "password2", "referral_code"]
+        fields = ["id", "email", "username", "password", "password2", "referral_code", "member_type"]
 
     # Check if passwords match
     def validate_password2(self, password2: str):
@@ -49,14 +50,27 @@ class SignUpSerializer(serializers.ModelSerializer):
         # Remove second password field
         _ = validated_data.pop("password2")
         referral_code = validated_data.pop("referral_code", None)
+        member_type = validated_data.get("member_type")
         # Create User
         user = User.objects.create_user(**validated_data)
 
-        #new
+        # new
         code, _ = OTPUtils.generate_otp(user)
         email = validated_data.get("email")
         username = validated_data.get("username")
-        send_email_template(email, "d-84ad6c792bf64437bb592b604214806a", {email: {"username": username, "otp":code}})
+        send_email_template(email, "d-84ad6c792bf64437bb592b604214806a", {email: {"username": username, "otp": code}})
+
+        # member type data
+        if member_type == "ST":
+            member_data = query_community_endpoint(email)
+            if not member_data:
+                raise serializers.ValidationError({"email": "Email not found in community database"})
+
+            profile, created = Profile.objects.get_or_create(user=user)
+            profile.first_name = member_data["data"]["first_name"]
+            profile.last_name = member_data["data"]["last_name"]
+            profile.phone_number = member_data["data"]["phone_number"]
+            profile.save()
 
         if referral_code:
             try:
@@ -68,7 +82,9 @@ class SignUpSerializer(serializers.ModelSerializer):
                 pass
         return user
 
-# new    
+# new
+
+
 class OTPVerifySerializer(serializers.Serializer):
     email = serializers.EmailField(required=True)
     code = serializers.CharField(min_length=6, required=True)
@@ -77,7 +93,7 @@ class OTPVerifySerializer(serializers.Serializer):
         email = data.get("email")
         code = data.get("code")
 
-        user = User.objects.filter(email = email).first()
+        user = User.objects.filter(email=email).first()
         if not user:
             raise serializers.ValidationError("User not found")
 
@@ -91,9 +107,6 @@ class OTPVerifySerializer(serializers.Serializer):
         user.save()
 
         return user
-    
-
-
 
 
 class SignupResponseSerializer(serializers.ModelSerializer):
@@ -106,7 +119,7 @@ class SignupResponseSerializer(serializers.ModelSerializer):
     @swagger_serializer_method(
         serializer_or_field=serializers.JSONField(),
     )
-    def get_token(self, user: User): # type: ignore
+    def get_token(self, user: User):  # type: ignore
         refresh = RefreshToken.for_user(user)
         return {"refresh": str(refresh), "access": str(refresh.access_token)}
 
