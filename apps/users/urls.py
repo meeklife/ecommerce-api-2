@@ -26,8 +26,8 @@ router.register("users", UserView, basename="users")
 
 urlpatterns = [
     path("auth/signup/", SignUpView.as_view(), name="signup"),
-    path("auth/verify-otp/", OTPVerifyView.as_view(), name= 'verify-otp'),
-    path("auth/verify-email/", EmailVerification.as_view(), name = 'email-verify'),
+    path("auth/verify-otp/", OTPVerifyView.as_view(), name="verify-otp"),
+    path("auth/verify-email/", EmailVerification.as_view(), name="email-verify"),
     path("auth/login/", TokenObtainPairView.as_view(), name="token-obtain"),
     path("auth/refresh-token/", TokenRefreshView.as_view(), name="token-refresh"),
     path("auth/forget-password/", ForgotPasswordView.as_view(), name="forget-password"),

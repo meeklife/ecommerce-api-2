@@ -36,6 +36,7 @@ class UserManager(BaseUserManager):
 
 class User(PermissionsMixin, base_models.BaseModel, AbstractBaseUser):
     """Default user for api_project."""
+
     class MemberType(models.TextChoices):
         SLIGHTLY_TECHIE = "ST", _("Techie")
         NON_SLIGHTLY_TECHIE = "NT", _("Non_Techie")

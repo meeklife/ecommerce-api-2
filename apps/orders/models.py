@@ -2,7 +2,6 @@ from django.db import models
 from django.utils.translation import gettext_lazy as _
 
 from apps.common import models as base_models
-from apps.finance.models import Transaction
 from apps.products.models import Product
 from apps.users import models as usermodels
 

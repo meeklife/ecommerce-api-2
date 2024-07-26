@@ -1,8 +1,5 @@
-from datetime import timedelta
-
 from .base import *  # noqa
 from .base import env
-
 
 # GENERAL
 # ------------------------------------------------------------------------------
@@ -92,7 +89,7 @@ STORAGES = {
     "staticfiles": {
         # Leave whatever setting you already have here, e.g.:
         # "BACKEND": "django.contrib.staticfiles.storage.StaticFilesStorage",
-        "BACKEND": 'whitenoise.storage.CompressedManifestStaticFilesStorage',
+        "BACKEND": "whitenoise.storage.CompressedManifestStaticFilesStorage",
     },
 }
 

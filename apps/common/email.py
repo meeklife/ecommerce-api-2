@@ -1,7 +1,6 @@
-from django.conf import settings
-from django.core.mail import EmailMessage
-from django.core.mail import send_mail
 from anymail.message import AnymailMessage
+from django.core.mail import EmailMessage
+
 from config.settings.base import env
 
 

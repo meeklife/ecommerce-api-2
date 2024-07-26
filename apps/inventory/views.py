@@ -1,5 +1,5 @@
 from rest_framework.permissions import IsAdminUser
-from rest_framework.viewsets import ModelViewSet, ReadOnlyModelViewSet
+from rest_framework.viewsets import ReadOnlyModelViewSet
 
 from .models import Inventory
 from .serializers import InventorySerializer
