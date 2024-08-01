@@ -1,6 +1,6 @@
 from django.db import transaction
+from django.shortcuts import get_object_or_404
 
-# from django.shortcuts import get_object_or_404
 # from django.urls import reverse
 from rest_framework import status
 from rest_framework.decorators import action
@@ -62,8 +62,11 @@ class OrderViewSet(ModelViewSet):
         serializer = self.get_serializer(order)  # noqa
 
         kobo_amount = int(total_cost * 1000)
-        # callback_url = request.build_absolute_uri(reverse("payment/verify"))
-        callback_url = request.build_absolute_uri("payment/verify")
+        # callback_url = request.build_absolute_uri(reverse("payment_verify"))
+        callback_url = request.build_absolute_uri(
+            "http://127.0.0.1:8000/api/order/payment/verify/"
+        )
+        # callback_url = reverse("payment_verify")
 
         payment_response = PaystackUtils.initialize_transaction(
             amount=kobo_amount,
@@ -72,11 +75,11 @@ class OrderViewSet(ModelViewSet):
             reference=str(order.id),
         )
 
-        if payment_response.status:
+        if payment_response["status"]:
             return Response(
                 {
                     "order_id": order.id,
-                    "payment_url": payment_response.data["authorization_url"],
+                    "payment_url": payment_response["data"]["authorization_url"],
                 }
             )
         else:
@@ -99,10 +102,9 @@ class OrderViewSet(ModelViewSet):
 
         response = PaystackUtils.verify_transaction(reference)
 
-        if response.status:
-            if response.data["status"] == "success":
-                # order = get_object_or_404(Order, id=reference)
-                order = self.get_object()
+        if response["status"]:
+            if response["data"]["status"] == "success":
+                order = get_object_or_404(Order, id=reference)
                 order.status = "PC"
                 order.save()
 
