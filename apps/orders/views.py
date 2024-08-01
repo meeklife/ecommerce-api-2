@@ -1,4 +1,7 @@
 from django.db import transaction
+
+# from django.shortcuts import get_object_or_404
+# from django.urls import reverse
 from rest_framework import status
 from rest_framework.decorators import action
 from rest_framework.response import Response
@@ -6,6 +9,7 @@ from rest_framework.viewsets import ModelViewSet
 
 from apps.cart.models import CartItem, ShoppingCart
 from apps.finance.models import Transaction
+from apps.finance.paystack import PaystackUtils
 from apps.orders.models import Order, OrderItem
 from apps.orders.serializers import OrderItemSerializer, OrderSerializer
 from apps.users.models import Address
@@ -36,12 +40,13 @@ class OrderViewSet(ModelViewSet):
 
         total_amount = sum(item.product.price * item.quantity for item in cart_items)
         delivery_cost = 10
+        total_cost = total_amount + delivery_cost
         user_address = Address.objects.filter(user=request.user).first()
 
         order = Order.objects.create(
             user=request.user,
             delivery_cost=delivery_cost,
-            total_cost=total_amount + delivery_cost,
+            total_cost=total_cost,
             delivery_address=user_address,
             status="PE",
         )
@@ -54,34 +59,102 @@ class OrderViewSet(ModelViewSet):
                 price=cart_item.price,
             )
 
-        serializer = self.get_serializer(order)
-        ShoppingCart.objects.filter(user=request.user).delete()
-        return Response(serializer.data, status=status.HTTP_201_CREATED)
+        serializer = self.get_serializer(order)  # noqa
 
-    @action(detail=True, methods=["post"])
-    @transaction.atomic
-    def process_payment(self, request, pk=None):
-        order = self.get_object()
+        kobo_amount = int(total_cost * 1000)
+        # callback_url = request.build_absolute_uri(reverse("payment/verify"))
+        callback_url = request.build_absolute_uri("payment/verify")
 
-        success = True  # I simulated the payment gateway integration
+        payment_response = PaystackUtils.initialize_transaction(
+            amount=kobo_amount,
+            email=request.user.email,
+            callback_url=callback_url,
+            reference=str(order.id),
+        )
 
-        if success:
-            Transaction.objects.create(
-                user=request.user,
-                order=order,
-                amount=order.total_cost,
-                status="PA",
-                payment_method="CD",
+        if payment_response.status:
+            return Response(
+                {
+                    "order_id": order.id,
+                    "payment_url": payment_response.data["authorization_url"],
+                }
+            )
+        else:
+            order.delete()
+            return Response({"details": "Failed to initialize payment"})
+
+    @action(
+        detail=False,
+        methods=["get"],
+        url_path="payment/verify",
+        url_name="payment_verify",
+    )
+    def payment_verify(self, request):
+        reference = request.query_params.get("reference")
+
+        if not reference:
+            return Response(
+                {"detail": " No reference provided"}, status=status.HTTP_400_BAD_REQUEST
             )
 
-            order.status = "PC"
-            order.save()
+        response = PaystackUtils.verify_transaction(reference)
 
-            return Response({"detail": "Payment successful"}, status=status.HTTP_200_OK)
+        if response.status:
+            if response.data["status"] == "success":
+                # order = get_object_or_404(Order, id=reference)
+                order = self.get_object()
+                order.status = "PC"
+                order.save()
+
+                Transaction.objects.create(
+                    user=request.user,
+                    order=order,
+                    amount=order.total_cost,
+                    status="PA",
+                    payment_method="CD",
+                )
+
+                ShoppingCart.objects.filter(user=request.user).delete()
+
+                return Response(
+                    {"detail": "Payment successful"}, status=status.HTTP_200_OK
+                )
+
+            else:
+                return Response(
+                    {"detail": "Payment failed"}, status=status.HTTP_400_BAD_REQUEST
+                )
+
         else:
             return Response(
-                {"detail": "Payment failed"}, status=status.HTTP_400_BAD_REQUEST
+                {"detail": "Failed to verify payment"},
+                status=status.HTTP_400_BAD_REQUEST,
             )
+
+    # @action(detail=True, methods=["post"])
+    # @transaction.atomic
+    # def process_payment(self, request, pk=None):
+    #     order = self.get_object()
+
+    #     success = True  # I simulated the payment gateway integration
+
+    #     if success:
+    #         Transaction.objects.create(
+    #             user=request.user,
+    #             order=order,
+    #             amount=order.total_cost,
+    #             status="PA",
+    #             payment_method="CD",
+    #         )
+
+    #         order.status = "PC"
+    #         order.save()
+
+    #         return Response({"detail": "Payment successful"}, status=status.HTTP_200_OK)
+    #     else:
+    #         return Response(
+    #             {"detail": "Payment failed"}, status=status.HTTP_400_BAD_REQUEST
+    #         )
 
 
 class OrderItemViewset(ModelViewSet):

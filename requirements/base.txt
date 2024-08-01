@@ -9,3 +9,4 @@ django-environ==0.10.0
 drf-yasg==1.21.5
 pyotp==2.8.0
 Pillow==9.5.0
+paystackapi==2.1.2
