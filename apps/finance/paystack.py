@@ -20,8 +20,3 @@ class PaystackUtils:
     def verify_transaction(ref):
         response = paystack.transaction.verify(ref)
         return response
-
-    # @classmethod
-    # def intitiate_payment(self, amount, email, metadata=None, plan=None):
-    #     response = self.initialize_transaction(amount, email, metadata=metadata)
-    #     if
