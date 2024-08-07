@@ -61,7 +61,7 @@ class OrderViewSet(ModelViewSet):
 
         serializer = self.get_serializer(order)  # noqa
 
-        kobo_amount = int(total_cost * 1000)
+        kobo_amount = int(total_cost * 100)
         # callback_url = request.build_absolute_uri(reverse("payment_verify"))
         callback_url = request.build_absolute_uri(
             "http://127.0.0.1:8000/api/order/payment/verify/"
