@@ -44,7 +44,7 @@ class OTPUtils:
         return encoded.decode()
 
     @classmethod
-    def generate_otp(cls, user= User, life=600):
+    def generate_otp(cls, user=User, life=600):
         """Generates opt code
 
         Params:
@@ -58,7 +58,7 @@ class OTPUtils:
         """
         secret = pyotp.random_base32()
         user.otp_secret = secret
-        user.save(update_fields= ["otp_secret", "updated_at"])
+        user.save(update_fields=["otp_secret", "updated_at"])
         data = {"user_id": str(user.id), "secret": secret}
         # generate token
         token = cls.generate_token(data)

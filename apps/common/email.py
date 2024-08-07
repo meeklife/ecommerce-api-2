@@ -1,15 +1,13 @@
+from anymail.message import AnymailMessage
 from django.conf import settings
 from django.core.mail import EmailMessage
-from django.core.mail import send_mail
-from anymail.message import AnymailMessage
-from config.settings.base import env
 
 
 def send_email(subject, message, recipient, fail_silently=False):
     msg = EmailMessage(
         subject,
         message,
-        from_email=env("FROM_EMAIL"),
+        from_email=settings.FROM_EMAIL,
         to=[recipient],
         reply_to=[recipient],
     )
@@ -27,9 +25,9 @@ def send_email_template(
     https://docs.sendgrid.com/ui/sending-email/how-to-send-an-email-with-dynamic-transactional-templates
     """
     msg = AnymailMessage(
-        from_email=env("FROM_EMAIL"),
+        from_email=settings.FROM_EMAIL,
         to=[email],
-        reply_to=[env("FROM_EMAIL")],
+        reply_to=[settings.FROM_EMAIL],
     )
     msg.template_id = template_id
 

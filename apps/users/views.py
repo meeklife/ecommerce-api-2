@@ -8,10 +8,12 @@ from rest_framework.mixins import ListModelMixin, RetrieveModelMixin, UpdateMode
 from rest_framework.parsers import FormParser, MultiPartParser
 from rest_framework.permissions import AllowAny, IsAdminUser, IsAuthenticated
 from rest_framework.response import Response
-from rest_framework.viewsets import GenericViewSet, ModelViewSet
 from rest_framework.views import APIView
+from rest_framework.viewsets import GenericViewSet, ModelViewSet
+
 from apps.common.email import send_email
 from apps.common.utils import OTPUtils
+
 from .models import Address, Profile, Role
 from .serializers import (
     AddressSerializer,
@@ -161,6 +163,7 @@ class ProfileView(ModelViewSet):
             return self.queryset
         return self.queryset.filter(user=user)
 
+
 # view for verifying otp
 class OTPVerifyView(CreateAPIView):
     serializer_class = OTPVerifySerializer
@@ -172,27 +175,22 @@ class OTPVerifyView(CreateAPIView):
         serializer.is_valid(raise_exception=True)
         serializer.save()
 
-        return Response({"message": "Email verified successfully"}, status=status.HTTP_200_OK)
-    
+        return Response(
+            {"message": "Email verified successfully"}, status=status.HTTP_200_OK
+        )
 
 
 class EmailVerification(APIView):
-    
     permission_classes = [IsAuthenticated]
 
     def get(self, request):
-
         user = request.user
         code, _ = OTPUtils.generate_otp(user)
 
-        recipient =user.email
+        recipient = user.email
 
         subject = "Email Verification Code"
-        message =f"Your email verification code is {code}"
+        message = f"Your email verification code is {code}"
 
-         
         send_email(subject, message, recipient)
         return Response("OK")
-
-    
-

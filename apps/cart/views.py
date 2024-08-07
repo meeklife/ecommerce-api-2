@@ -1,4 +1,3 @@
-from django.shortcuts import render
 from rest_framework import status
 from rest_framework.decorators import action
 from rest_framework.response import Response
@@ -65,9 +64,7 @@ class ShoppingCartViewSet(ModelViewSet):
             )
 
         except CartItem.MultipleObjectsReturned:
-            return Response({
-                "detail": "Multiple Items found"
-            })
+            return Response({"detail": "Multiple Items found"})
 
         response_data = CartItemSerializer(cart_item)
         return Response(response_data.data, status=status.HTTP_202_ACCEPTED)
@@ -82,9 +79,7 @@ class ShoppingCartViewSet(ModelViewSet):
                 {"detail": "Item not found."}, status=status.HTTP_404_NOT_FOUND
             )
         except CartItem.MultipleObjectsReturned:
-            return Response({
-                "detail": "Multiple items found"
-            })
+            return Response({"detail": "Multiple items found"})
 
         cart_item.delete()
 

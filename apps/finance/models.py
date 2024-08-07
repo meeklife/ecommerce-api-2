@@ -43,7 +43,9 @@ class Transaction(base_models.BaseModel):
         ST_POINTS = "SP", _("St_points")
         REFERRAL_POINTS = "RP", _("Referral_points")
 
-    user = models.ForeignKey(usermodels.User, on_delete=models.CASCADE, related_name="transactions")
+    user = models.ForeignKey(
+        usermodels.User, on_delete=models.CASCADE, related_name="transactions"
+    )
     order = models.OneToOneField("orders.Order", on_delete=models.CASCADE)
     status = models.CharField(
         max_length=2,

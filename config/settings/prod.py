@@ -1,8 +1,5 @@
-from datetime import timedelta
-
 from .base import *  # noqa
 from .base import env
-
 
 # GENERAL
 # ------------------------------------------------------------------------------
@@ -92,7 +89,7 @@ STORAGES = {
     "staticfiles": {
         # Leave whatever setting you already have here, e.g.:
         # "BACKEND": "django.contrib.staticfiles.storage.StaticFilesStorage",
-        "BACKEND": 'whitenoise.storage.CompressedManifestStaticFilesStorage',
+        "BACKEND": "whitenoise.storage.CompressedManifestStaticFilesStorage",
     },
 }
 
@@ -111,7 +108,8 @@ TEMPLATES[-1]["OPTIONS"]["loaders"] = [  # type: ignore[index] # noqa F405
 
 # EMAIL
 # ------------------------------------------------------------------------------
-DEFAULT_FROM_EMAIL = env("DJANGO_DEFAULT_FROM_EMAIL", default="no-repy@django.co")
+DEFAULT_FROM_EMAIL = env("FROM_EMAIL", default="no-repy@django.co")
+FROM_EMAIL = env("FROM_EMAIL", default="no-repy@django.co")
 SERVER_EMAIL = env("DJANGO_SERVER_EMAIL", default=DEFAULT_FROM_EMAIL)
 EMAIL_SUBJECT_PREFIX = env(
     "DJANGO_EMAIL_SUBJECT_PREFIX",
