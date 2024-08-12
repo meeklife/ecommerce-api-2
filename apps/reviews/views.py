@@ -37,7 +37,7 @@ class ProductReviewView(ModelViewSet):
 
 
 class AppReviewView(ModelViewSet):
-    queryset = AppReview.objects.all()
+    queryset = AppReview.objects.all().prefetch_related("user")
     serializer_class = AppReviewSerializer
     permission_classes = [AllowAny]
 

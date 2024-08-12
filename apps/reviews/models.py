@@ -33,6 +33,7 @@ class AppReview(base_models.BaseModel):
 
     class Meta:
         ordering = ("created_at",)
+        unique_together = ("user",)
 
     def __str__(self):
         return f"{self.user.username} gave a ratings of {self.rating}"
