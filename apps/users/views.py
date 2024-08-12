@@ -148,7 +148,7 @@ class AddressView(ModelViewSet):
 
 
 class ProfileView(ModelViewSet):
-    queryset = Profile.objects.all()
+    queryset = Profile.objects.all().prefetch_related("user", "role")
     serializer_class = ProfileSerializer
     filterset_fields = ("user", "role")
     parser_classes = (FormParser, MultiPartParser)
