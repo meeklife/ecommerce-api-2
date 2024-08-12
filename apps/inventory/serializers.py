@@ -6,7 +6,7 @@ from .models import Inventory
 
 class InventorySerializer(serializers.ModelSerializer):
     product = serializers.PrimaryKeyRelatedField(queryset=Product.objects.all())
-    product_name = serializers.CharField(source="product", read_only=True)
+    product_name = serializers.CharField(source="product.name", read_only=True)
 
     class Meta:
         model = Inventory
