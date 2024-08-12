@@ -39,7 +39,7 @@ class Product(base_models.BaseModel):
 
 class ProductImage(base_models.BaseModel):
     product = models.ForeignKey(Product, on_delete=models.CASCADE)
-    product_image = models.ImageField(upload_to="profile")
+    product_image = models.ImageField(upload_to="productImg")
 
     class Meta:
         ordering = ("created_at",)
