@@ -1,9 +1,9 @@
+from cloudinary.models import CloudinaryField
 from django.db import models
 
+from apps.brands.models import Brand
 from apps.common import models as base_models
-
-from ..brands.models import Brand
-from ..users.models import User
+from apps.users.models import User
 
 
 class ProductCategory(base_models.BaseModel):
@@ -39,7 +39,8 @@ class Product(base_models.BaseModel):
 
 class ProductImage(base_models.BaseModel):
     product = models.ForeignKey(Product, on_delete=models.CASCADE)
-    product_image = models.ImageField(upload_to="productImg")
+    # product_image = models.ImageField(upload_to="Product_Img")
+    product_image = CloudinaryField("image")
 
     class Meta:
         ordering = ("created_at",)
