@@ -13,6 +13,7 @@ class Inventory(base_models.BaseModel):
 
     class Meta:
         verbose_name_plural = "inventories"
+        ordering = ("created_at",)
 
     def __str__(self):
         return f"There are {self.quantity} units of {self.product.name} available"

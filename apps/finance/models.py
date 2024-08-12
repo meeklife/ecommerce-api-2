@@ -60,3 +60,6 @@ class Transaction(base_models.BaseModel):
 
     def __str__(self):
         return f"{self.user.username} made a transaction of {self.amount}"
+
+    class Meta:
+        ordering = ("created_at",)

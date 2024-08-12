@@ -11,6 +11,9 @@ class ShoppingCart(base_models.BaseModel):
     def __str__(self):
         return f"{self.user.username} Cart"
 
+    class Meta:
+        ordering = ("created_at",)
+
 
 class CartItem(base_models.BaseModel):
     cart = models.ForeignKey(
@@ -23,3 +26,6 @@ class CartItem(base_models.BaseModel):
     def __str__(self):
         return f"{self.quantity} quantity of {self.product.name} at the price of {self.price} \
               has been added to the cart of {self.cart.user.username}"
+
+    class Meta:
+        ordering = ("created_at",)
