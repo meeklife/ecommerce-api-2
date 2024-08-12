@@ -8,7 +8,7 @@ from .serializers import InvitationSerializer
 
 
 class InvitationCreateListView(CreateAPIView, ListAPIView):
-    queryset = Invitation.objects.all()
+    queryset = Invitation.objects.all().prefetch_related("inviter")
     serializer_class = InvitationSerializer
     permission_classes = [IsAuthenticated]
 
