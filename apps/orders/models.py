@@ -46,6 +46,9 @@ class Order(base_models.BaseModel):
     def __str__(self):
         return f"{self.user} placed an order"
 
+    class Meta:
+        ordering = ("created_at",)
+
 
 class OrderItem(base_models.BaseModel):
     order = models.ForeignKey(Order, on_delete=models.CASCADE, related_name="orderItem")

@@ -7,7 +7,7 @@ from .serializers import AppReviewSerializer, ProductReviewSerializer
 
 
 class ProductReviewView(ModelViewSet):
-    queryset = ProductReview.objects.all()
+    queryset = ProductReview.objects.all().prefetch_related("user", "product")
     serializer_class = ProductReviewSerializer
     permission_classes = [AllowAny]
 
@@ -37,7 +37,7 @@ class ProductReviewView(ModelViewSet):
 
 
 class AppReviewView(ModelViewSet):
-    queryset = AppReview.objects.all()
+    queryset = AppReview.objects.all().prefetch_related("user")
     serializer_class = AppReviewSerializer
     permission_classes = [AllowAny]
 

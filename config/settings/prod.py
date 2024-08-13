@@ -1,3 +1,7 @@
+import cloudinary
+import cloudinary.api
+import cloudinary.uploader
+
 from .base import *  # noqa
 from .base import env
 
@@ -74,6 +78,12 @@ MEDIA_URL = "/media/"
 CLOUDINARY_KEY = env("CLOUDINARY_KEY", default="")
 CLOUDINARY_SECRET = env("CLOUDINARY_SECRET", default="")
 CLOUDINARY_NAME = env("CLOUDINARY_NAME", default="")
+
+cloudinary.config(
+    CLOUD_NAME=CLOUDINARY_NAME,
+    CLOUDINARY_KEY=CLOUDINARY_KEY,
+    CLOUDINARY_SECRET=CLOUDINARY_SECRET,
+)
 
 CLOUDINARY_STORAGE = {
     "CLOUD_NAME": CLOUDINARY_NAME,

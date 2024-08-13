@@ -37,16 +37,21 @@ class ProductSerializer(serializers.ModelSerializer):
 class ProductImageSerializer(serializers.ModelSerializer):
     product = serializers.PrimaryKeyRelatedField(queryset=Product.objects.all())
     product_name = serializers.CharField(source="product.name", read_only=True)
+    img_url = serializers.SerializerMethodField()
 
     class Meta:
         model = ProductImage
-        fields = ["id", "product", "product_name", "product_image"]
+        fields = ["id", "product", "product_name", "product_image", "img_url"]
+
+    def get_img_url(self, obj):
+        if obj.product_image:
+            return obj.product_image.url
+        return None
 
 
 class FavoriteSerializer(serializers.ModelSerializer):
     product = serializers.PrimaryKeyRelatedField(queryset=Product.objects.all())
     user = serializers.PrimaryKeyRelatedField(queryset=User.objects.all())
-
     product_name = serializers.CharField(source="product.name", read_only=True)
 
     class Meta:

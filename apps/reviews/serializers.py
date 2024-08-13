@@ -1,25 +1,24 @@
 from rest_framework import serializers
+from rest_framework.exceptions import ValidationError
 
-from ..products.models import Product
-from ..products.serializers import ProductSerializer
-from ..users.serializers import UserSerializer
-from .models import AppReview, ProductReview
+from apps.products.models import Product
+from apps.reviews.models import AppReview, ProductReview
 
 
 class ProductReviewSerializer(serializers.ModelSerializer):
     product = serializers.PrimaryKeyRelatedField(queryset=Product.objects.all())
     user = serializers.PrimaryKeyRelatedField(read_only=True)
-    user_details = UserSerializer(source="user", read_only=True)
-    product_details = ProductSerializer(source="product", read_only=True)
+    username = serializers.CharField(source="user.username", read_only=True)
+    product_name = serializers.CharField(source="product.name", read_only=True)
 
     class Meta:
         model = ProductReview
         fields = [
             "id",
             "user",
-            "user_details",
+            "username",
             "product",
-            "product_details",
+            "product_name",
             "rating",
             "description",
         ]
@@ -27,8 +26,14 @@ class ProductReviewSerializer(serializers.ModelSerializer):
 
 class AppReviewSerializer(serializers.ModelSerializer):
     user = serializers.PrimaryKeyRelatedField(read_only=True)
-    user_details = UserSerializer(source="user", read_only=True)
+    username = serializers.CharField(source="user.username", read_only=True)
 
     class Meta:
         model = AppReview
-        fields = ["id", "user", "user_details", "rating", "description"]
+        fields = ["id", "user", "username", "rating", "description"]
+
+    def validate(self, data):
+        user = self.context["request"].user
+        if AppReview.objects.filter(user=user).exists():
+            raise ValidationError("You have already reviewed this app.")
+        return data

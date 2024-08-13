@@ -21,7 +21,9 @@ class ShoppingCartViewSet(ModelViewSet):
     def get_queryset(self):
         user = self.request.user
         if user.is_authenticated:
-            return ShoppingCart.objects.filter(user=self.request.user)
+            return ShoppingCart.objects.filter(user=self.request.user).prefetch_related(
+                "items__product", "items__product__brand", "items__product__category"
+            )
         return ShoppingCart.objects.none()
 
     def get_object(self):
@@ -56,7 +58,7 @@ class ShoppingCartViewSet(ModelViewSet):
     @action(detail=False, methods=["get"], url_path="cartitem/(?P<item_id>[^/.]+)")
     def retrieve_cartitem(self, request, item_id=None):
         try:
-            cart_item = CartItem.objects.get(id=item_id)
+            cart_item = CartItem.objects.select_related("product").get(id=item_id)
 
         except CartItem.DoesNotExist:
             return Response(
