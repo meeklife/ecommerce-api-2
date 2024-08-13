@@ -88,7 +88,7 @@ class SignUpSerializer(serializers.ModelSerializer):
         if referral_code:
             try:
                 profile = Profile.objects.get(referral_code=referral_code)
-                profile.update_referral(5)
+                profile.update_referral(+10)
                 user.profile.referrer = profile.user
                 user.profile.save(update_fields=["referrer", "updated_at"])
             except Profile.DoesNotExist:
@@ -242,7 +242,17 @@ class RoleSerializer(serializers.ModelSerializer):
 class AddressSerializer(serializers.ModelSerializer):
     class Meta:
         model = Address
-        fields = "__all__"
+        fields = [
+            "id",
+            "address_name",
+            "street_name",
+            "address",
+            "city",
+            "town",
+            "country",
+            "lat",
+            "lon",
+        ]
 
 
 class ProfileSerializer(serializers.ModelSerializer):

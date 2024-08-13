@@ -146,6 +146,9 @@ class AddressView(ModelViewSet):
             return self.queryset
         return self.queryset.filter(user=user)
 
+    def perform_create(self, serializer):
+        serializer.save(user=self.request.user)
+
 
 class ProfileView(ModelViewSet):
     queryset = Profile.objects.all().prefetch_related("user", "role")

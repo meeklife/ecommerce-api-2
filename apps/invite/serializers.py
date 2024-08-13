@@ -8,18 +8,21 @@ from .models import Invitation
 class InvitationSerializer(serializers.ModelSerializer):
     # A read-only field to represent the name of the inviter
     # This will include the name of the inviter in the serialized representation of the Invitation object.
-    user = serializers.ReadOnlyField(source="inviter.name")
+    inviter = serializers.ReadOnlyField(source="inviter.username")
+    referral_code = serializers.SerializerMethodField()
 
     class Meta:
         model = Invitation
         fields = [
             "id",
-            "user",
             "inviter",
             "referral_code",
             "email",
             "join",
         ]
+
+    def get_referral_code(self, obj):
+        return obj.inviter.username
 
     def validate_email(self, value):
         # Check if the email is already registered or an invitation is pending
