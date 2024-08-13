@@ -123,15 +123,16 @@ class OrderViewSet(ModelViewSet):
 
                 ShoppingCart.objects.filter(user=request.user).delete()
 
-                user_profile = Profile.objects.get(user=request.user)
-                if user_profile:
-                    try:
-                        referrer = user_profile.referrer
+                if order.total_cost >= 50:
+                    user_profile = Profile.objects.get(user=request.user)
+                    if user_profile:
+                        try:
+                            referrer = user_profile.referrer
 
-                        referrer.profile.update_referral(+5)
-                        referrer.save()
-                    except Profile.DoesNotExist:
-                        pass
+                            referrer.profile.update_referral(+5)
+                            referrer.save()
+                        except Profile.DoesNotExist:
+                            pass
 
                 return Response(
                     {"detail": "Payment successful"}, status=status.HTTP_200_OK
