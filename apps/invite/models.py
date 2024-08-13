@@ -14,7 +14,6 @@ class Invitation(base_models.BaseModel):
     inviter = models.ForeignKey(
         User, on_delete=models.CASCADE
     )  # The user who is sending the invitation
-    referral_code = models.CharField(max_length=50)
     email = models.EmailField()  # The email address of the invitee
     join = models.BooleanField(default=False)
 

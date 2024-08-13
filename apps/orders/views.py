@@ -12,7 +12,7 @@ from apps.finance.models import Transaction
 from apps.finance.paystack import PaystackUtils
 from apps.orders.models import Order, OrderItem
 from apps.orders.serializers import OrderItemSerializer, OrderSerializer
-from apps.users.models import Address
+from apps.users.models import Address, Profile
 
 
 class OrderViewSet(ModelViewSet):
@@ -36,12 +36,17 @@ class OrderViewSet(ModelViewSet):
             return Response(
                 {"detail": "Cart is empty"}, status=status.HTTP_400_BAD_REQUEST
             )
-        cart_items = CartItem.objects.filter(cart=cart.id)
+        cart_items = CartItem.objects.filter(cart=cart.id).prefetch_related("product")
 
         total_amount = sum(item.product.price * item.quantity for item in cart_items)
         delivery_cost = 10
         total_cost = total_amount + delivery_cost
         user_address = Address.objects.filter(user=request.user).first()
+        if not user_address:
+            return Response(
+                {"detail": "Please add a delivery address"},
+                status=status.HTTP_400_BAD_REQUEST,
+            )
 
         order = Order.objects.create(
             user=request.user,
@@ -118,6 +123,16 @@ class OrderViewSet(ModelViewSet):
 
                 ShoppingCart.objects.filter(user=request.user).delete()
 
+                user_profile = Profile.objects.get(user=request.user)
+                if user_profile:
+                    try:
+                        referrer = user_profile.referrer
+
+                        referrer.profile.update_referral(5)
+                        referrer.save()
+                    except Profile.DoesNotExist:
+                        pass
+
                 return Response(
                     {"detail": "Payment successful"}, status=status.HTTP_200_OK
                 )
@@ -132,31 +147,6 @@ class OrderViewSet(ModelViewSet):
                 {"detail": "Failed to verify payment"},
                 status=status.HTTP_400_BAD_REQUEST,
             )
-
-    # @action(detail=True, methods=["post"])
-    # @transaction.atomic
-    # def process_payment(self, request, pk=None):
-    #     order = self.get_object()
-
-    #     success = True  # I simulated the payment gateway integration
-
-    #     if success:
-    #         Transaction.objects.create(
-    #             user=request.user,
-    #             order=order,
-    #             amount=order.total_cost,
-    #             status="PA",
-    #             payment_method="CD",
-    #         )
-
-    #         order.status = "PC"
-    #         order.save()
-
-    #         return Response({"detail": "Payment successful"}, status=status.HTTP_200_OK)
-    #     else:
-    #         return Response(
-    #             {"detail": "Payment failed"}, status=status.HTTP_400_BAD_REQUEST
-    #         )
 
 
 class OrderItemViewset(ModelViewSet):
