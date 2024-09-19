@@ -37,6 +37,10 @@ class UserManager(BaseUserManager):
 class User(PermissionsMixin, base_models.BaseModel, AbstractBaseUser):
     """Default user for api_project."""
 
+    class MemberType(models.TextChoices):
+        SLIGHTLY_TECHIE = "ST", _("Techie")
+        NON_SLIGHTLY_TECHIE = "NT", _("Non_Techie")
+
     # class Roles(models.TextChoices):
     #     MANAGER = "manager", _("Manager")
     #     ADMIN = "admin", _("Admin")
@@ -51,7 +55,10 @@ class User(PermissionsMixin, base_models.BaseModel, AbstractBaseUser):
         help_text=_("Designates whether the user can log into the admin site"),
     )
     # role = models.CharField(max_length=25, choices=Roles.choices, default=Roles.USER)
+    is_verified = models.BooleanField(default=False)  # new
     deleted = models.BooleanField(default=False)
+    otp_secret = models.CharField(max_length=100, null=True, blank=True)
+    member_type = models.CharField(max_length=3, choices=MemberType.choices)
 
     objects = UserManager()
 
@@ -63,7 +70,7 @@ class User(PermissionsMixin, base_models.BaseModel, AbstractBaseUser):
     REQUIRED_FIELDS = ["username"]
 
     def get_full_name(self):
-        return self.name
+        return self.username
 
     def get_short_name(self):
         return self.email
@@ -97,7 +104,7 @@ class Address(base_models.BaseModel):
         ordering = ("created_at",)
 
     def __str__(self):
-        return f"{self.user.name}::{self.address_name}"
+        return f"{self.user.username}::{self.address_name}"
 
 
 class Profile(base_models.BaseModel):

@@ -15,6 +15,9 @@ class ProductReview(base_models.BaseModel):
     )
     description = models.TextField(blank=True)
 
+    class Meta:
+        ordering = ("created_at",)
+
     def __str__(self):
         return (
             f"{self.user.username} gave {self.product.name} a ratings of {self.rating}"
@@ -30,6 +33,7 @@ class AppReview(base_models.BaseModel):
 
     class Meta:
         ordering = ("created_at",)
+        unique_together = ("user",)
 
     def __str__(self):
         return f"{self.user.username} gave a ratings of {self.rating}"

@@ -1,4 +1,6 @@
-from datetime import timedelta
+import cloudinary
+import cloudinary.api
+import cloudinary.uploader
 
 from .base import *  # noqa
 from .base import env
@@ -7,6 +9,20 @@ from .base import env
 # ------------------------------------------------------------------------------
 SECRET_KEY = env("DJANGO_SECRET_KEY")
 ALLOWED_HOSTS = env.list("DJANGO_ALLOWED_HOSTS", default=["example.com"])
+
+
+# MIDDLEWARE
+# ----------------------------------------------------------------------------
+MIDDLEWARE = [
+    "django.middleware.security.SecurityMiddleware",
+    "django.contrib.sessions.middleware.SessionMiddleware",
+    "whitenoise.middleware.WhiteNoiseMiddleware",
+    "django.middleware.common.CommonMiddleware",
+    "django.middleware.csrf.CsrfViewMiddleware",
+    "django.contrib.auth.middleware.AuthenticationMiddleware",
+    "django.contrib.messages.middleware.MessageMiddleware",
+    "django.middleware.clickjacking.XFrameOptionsMiddleware",
+]
 
 
 # DATABASES
@@ -37,12 +53,12 @@ SECURE_CONTENT_TYPE_NOSNIFF = env.bool(
 
 # STORAGES [django-storages]
 # ------------------------------------------------------------------------------
-INSTALLED_APPS += ["storages"]  # noqa F405
-GS_BUCKET_NAME = env("DJANGO_GCP_STORAGE_BUCKET_NAME")
-GS_DEFAULT_ACL = "publicRead"
-GS_EXPIRATION = timedelta(days=7)
+INSTALLED_APPS += ["storages", "cloudinary_storage", "cloudinary"]  # noqa F405
+# GS_BUCKET_NAME = env("DJANGO_GCP_STORAGE_BUCKET_NAME")
+# GS_DEFAULT_ACL = "publicRead"
+# GS_EXPIRATION = timedelta(days=7)
 # Reduce default storage chunck size to stop memory blowups in app engine to 8MB from Default 100MB
-GS_BLOB_CHUNK_SIZE = 8 * 1024 * 1024  # 8MB
+# GS_BLOB_CHUNK_SIZE = 8 * 1024 * 1024  # 8MB
 
 # STATIC
 # ------------------------
@@ -54,16 +70,36 @@ STATIC_ROOT = "static"
 
 # MEDIA
 # ------------------------------------------------------------------------------
-DEFAULT_FILE_STORAGE = "apps.utils.storages.MediaRootGoogleCloudStorage"
-MEDIA_URL = f"https://storage.googleapis.com/{GS_BUCKET_NAME}/media/"
+# DEFAULT_FILE_STORAGE = "apps.utils.storages.MediaRootGoogleCloudStorage"
+# MEDIA_URL = f"https://storage.googleapis.com/{GS_BUCKET_NAME}/media/"
+
+MEDIA_URL = "/media/"
+
+CLOUDINARY_KEY = env("CLOUDINARY_KEY", default="")
+CLOUDINARY_SECRET = env("CLOUDINARY_SECRET", default="")
+CLOUDINARY_NAME = env("CLOUDINARY_NAME", default="")
+
+cloudinary.config(
+    CLOUD_NAME=CLOUDINARY_NAME,
+    CLOUDINARY_KEY=CLOUDINARY_KEY,
+    CLOUDINARY_SECRET=CLOUDINARY_SECRET,
+)
+
+CLOUDINARY_STORAGE = {
+    "CLOUD_NAME": CLOUDINARY_NAME,
+    "API_SECRET": CLOUDINARY_SECRET,
+    "API_KEY": CLOUDINARY_KEY,
+}
 
 STORAGES = {
     "default": {
-        "BACKEND": "storages.backends.s3boto3.S3Boto3Storage",
+        # "BACKEND": "storages.backends.s3boto3.S3Boto3Storage",
+        "BACKEND": "cloudinary_storage.storage.MediaCloudinaryStorage",
     },
     "staticfiles": {
         # Leave whatever setting you already have here, e.g.:
-        "BACKEND": "django.contrib.staticfiles.storage.StaticFilesStorage",
+        # "BACKEND": "django.contrib.staticfiles.storage.StaticFilesStorage",
+        "BACKEND": "whitenoise.storage.CompressedManifestStaticFilesStorage",
     },
 }
 
@@ -82,7 +118,8 @@ TEMPLATES[-1]["OPTIONS"]["loaders"] = [  # type: ignore[index] # noqa F405
 
 # EMAIL
 # ------------------------------------------------------------------------------
-DEFAULT_FROM_EMAIL = env("DJANGO_DEFAULT_FROM_EMAIL", default="no-repy@django.co")
+DEFAULT_FROM_EMAIL = env("FROM_EMAIL", default="no-repy@django.co")
+FROM_EMAIL = env("FROM_EMAIL", default="no-repy@django.co")
 SERVER_EMAIL = env("DJANGO_SERVER_EMAIL", default=DEFAULT_FROM_EMAIL)
 EMAIL_SUBJECT_PREFIX = env(
     "DJANGO_EMAIL_SUBJECT_PREFIX",
@@ -108,7 +145,7 @@ ANYMAIL = {
 # Collectfast
 # ------------------------------------------------------------------------------
 # https://github.com/antonagestam/collectfast#installation
-INSTALLED_APPS = ["collectfast"] + INSTALLED_APPS  # noqa F405
+# INSTALLED_APPS = ["collectfast"] + INSTALLED_APPS  # noqa F405
 
 # LOGGING
 # ------------------------------------------------------------------------------
