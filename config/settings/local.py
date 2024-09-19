@@ -26,9 +26,9 @@ CACHES = {
 EMAIL_BACKEND = env(
     "DJANGO_EMAIL_BACKEND", default="django.core.mail.backends.console.EmailBackend"
 )
-FROM_EMAIL = env("FROM_EMAIL")
+FROM_EMAIL = env("FROM_EMAIL", default="")
 ANYMAIL = {
-    "SENDGRID_API_KEY": env("SENDGRID_API_KEY"),
+    "SENDGRID_API_KEY": env("SENDGRID_API_KEY", default=""),
     "SENDGRID_API_URL": env("SENDGRID_API_URL", default="https://api.sendgrid.com/v3/"),
 }
 
