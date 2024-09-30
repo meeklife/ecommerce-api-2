@@ -2,7 +2,7 @@ from paystackapi.paystack import Paystack
 
 from config.settings.base import env
 
-paystack_secret_key = env("PAYSTACK_SECRET_KEY")
+paystack_secret_key = env("PAYSTACK_SECRET_KEY", default="")
 paystack = Paystack(secret_key=paystack_secret_key)
 
 
