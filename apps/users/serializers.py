@@ -3,8 +3,9 @@ from drf_yasg.utils import swagger_serializer_method
 from rest_framework import serializers
 from rest_framework_simplejwt.tokens import RefreshToken
 
-from apps.common.email import send_email
+from apps.common.email import send_email_template
 from apps.common.utils import OTPUtils
+from apps.users.utils import query_community_endpoint
 
 from .models import Address, Profile, Role
 
@@ -24,7 +25,15 @@ class SignUpSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = User
-        fields = ["id", "email", "username", "password", "password2", "referral_code"]
+        fields = [
+            "id",
+            "email",
+            "username",
+            "password",
+            "password2",
+            "referral_code",
+            "member_type",
+        ]
 
     # Check if passwords match
     def validate_password2(self, password2: str):
@@ -48,17 +57,69 @@ class SignUpSerializer(serializers.ModelSerializer):
         # Remove second password field
         _ = validated_data.pop("password2")
         referral_code = validated_data.pop("referral_code", None)
+        member_type = validated_data.get("member_type")
         # Create User
         user = User.objects.create_user(**validated_data)
+
+        # new
+        code, _ = OTPUtils.generate_otp(user)
+        email = validated_data.get("email")
+        username = validated_data.get("username")
+        send_email_template(
+            email,
+            "d-84ad6c792bf64437bb592b604214806a",
+            {email: {"username": username, "otp": code}},
+        )
+
+        # member type data
+        if member_type == "ST":
+            member_data = query_community_endpoint(email)
+            if not member_data:
+                raise serializers.ValidationError(
+                    {"email": "Email not found in community database"}
+                )
+
+            profile, created = Profile.objects.get_or_create(user=user)
+            profile.first_name = member_data["data"]["first_name"]
+            profile.last_name = member_data["data"]["last_name"]
+            profile.phone_number = member_data["data"]["phone_number"]
+            profile.save()
 
         if referral_code:
             try:
                 profile = Profile.objects.get(referral_code=referral_code)
-                profile.update_referral(5)
+                profile.update_referral(+10)
                 user.profile.referrer = profile.user
                 user.profile.save(update_fields=["referrer", "updated_at"])
             except Profile.DoesNotExist:
                 pass
+        return user
+
+
+# new
+
+
+class OTPVerifySerializer(serializers.Serializer):
+    email = serializers.EmailField(required=True)
+    code = serializers.CharField(min_length=6, required=True)
+
+    def create(self, data):
+        email = data.get("email")
+        code = data.get("code")
+
+        user = User.objects.filter(email=email).first()
+        if not user:
+            raise serializers.ValidationError("User not found")
+
+        # Verify OTP
+        if not OTPUtils.verify_otp(code, user.otp_secret):
+            raise serializers.ValidationError("Invalid OTP code")
+
+        # Verify user
+        user.is_verified = True
+        user.otp_secret = ""
+        user.save()
+
         return user
 
 
@@ -72,7 +133,7 @@ class SignupResponseSerializer(serializers.ModelSerializer):
     @swagger_serializer_method(
         serializer_or_field=serializers.JSONField(),
     )
-    def get_token(self, user: User):
+    def get_token(self, user: User):  # type: ignore
         refresh = RefreshToken.for_user(user)
         return {"refresh": str(refresh), "access": str(refresh.access_token)}
 
@@ -98,9 +159,9 @@ class ForgotPasswordSerializer(serializers.Serializer):
         email = validated_data.get("email")
         if user := User.objects.filter(email=email).first():
             code, token = OTPUtils.generate_otp(user)
-
-            # dynamic_data = {"first_name": user.first_name, "verification_code": code}
-            send_email(email, "Password Reset", code)
+            send_email_template(
+                email, "d-45557d1b684442b6aef71ae69d50c495", {email: {"code": code}}
+            )
 
         return {"token": token}
 
@@ -137,6 +198,9 @@ class ResetPasswordSerializer(serializers.Serializer):
         user.set_password(raw_password=password)
         user.save()
 
+        # send_email_template(user.email, "d-e4bf355645044030af3f6fbb6f360153", \
+        # {user.email: {"username": user.username}})
+
         return {
             "email": user.email,
         }
@@ -151,7 +215,7 @@ class ChangePasswordSerializer(serializers.Serializer):
 
     def create(self, validated_data):
         request = self.context.get("request")
-        user: User = request.user
+        user = request.user
 
         if not user.check_password(validated_data.get("old_password")):
             raise serializers.ValidationError({"detail": "Incorrect password"})
@@ -159,6 +223,12 @@ class ChangePasswordSerializer(serializers.Serializer):
         # reset password
         user.set_password(raw_password=validated_data.get("new_password"))
         user.save()
+
+        send_email_template(
+            user.email,
+            "d-7989ffbb4f114616846ef7ddff10a965",
+            {user.email: {"username": user.username}},
+        )
 
         return {"old_password": "", "new_password": ""}
 
@@ -172,7 +242,17 @@ class RoleSerializer(serializers.ModelSerializer):
 class AddressSerializer(serializers.ModelSerializer):
     class Meta:
         model = Address
-        fields = "__all__"
+        fields = [
+            "id",
+            "address_name",
+            "street_name",
+            "address",
+            "city",
+            "town",
+            "country",
+            "lat",
+            "lon",
+        ]
 
 
 class ProfileSerializer(serializers.ModelSerializer):

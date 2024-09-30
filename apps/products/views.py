@@ -24,7 +24,7 @@ class ProductCategoryView(ModelViewSet):
 
 
 class ProductView(ModelViewSet):
-    queryset = Product.objects.all()
+    queryset = Product.objects.all().prefetch_related("brand", "category")
     serializer_class = ProductSerializer
     permission_classes = [AllowAny]
 
@@ -37,7 +37,7 @@ class ProductView(ModelViewSet):
 
 
 class ProductImageView(ModelViewSet):
-    queryset = ProductImage.objects.all()
+    queryset = ProductImage.objects.all().prefetch_related("product")
     serializer_class = ProductImageSerializer
     permission_classes = [AllowAny]
 

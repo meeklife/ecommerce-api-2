@@ -33,6 +33,7 @@ SECRET_KEY = env(
     default="django-insecure-z!2xl-#czs^y#9*tgxyf__7u^-&%!)3zohyh73ndi)_$!pvou=",
 )
 
+
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = False
 
@@ -56,6 +57,7 @@ THIRD_PARTY_APPS = [
     "corsheaders",
     "django_filters",
     "drf_yasg",
+    "anymail",
 ]
 
 LOCAL_APPS = [
@@ -63,7 +65,11 @@ LOCAL_APPS = [
     "apps.brands.apps.BrandsConfig",
     "apps.products.apps.ProductsConfig",
     "apps.reviews.apps.ReviewsConfig",
+    "apps.invite.apps.InviteConfig",
     "apps.inventory.apps.InventoryConfig",
+    "apps.orders.apps.OrdersConfig",
+    "apps.finance.apps.FinanceConfig",
+    "apps.cart.apps.CartConfig",
 ]
 
 INSTALLED_APPS = DJANGO_APPS + THIRD_PARTY_APPS + LOCAL_APPS
@@ -181,8 +187,8 @@ LOGGING = {
 # -------------------------------------------------------------------------------
 # django-rest-framework - https://www.django-rest-framework.org/api-guide/settings/
 REST_FRAMEWORK = {
-    "DEFAULT_PAGINATION_CLASS": "apps.common.pagination.DefaultPagination",
-    "PAGE_SIZE": 20,
+    "DEFAULT_PAGINATION_CLASS": "rest_framework.pagination.PageNumberPagination",
+    "PAGE_SIZE": 25,
     "DEFAULT_AUTHENTICATION_CLASSES": (
         "rest_framework_simplejwt.authentication.JWTAuthentication",
     ),

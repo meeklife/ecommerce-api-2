@@ -1,8 +1,9 @@
-from datetime import timedelta
+import cloudinary
+import cloudinary.api
+import cloudinary.uploader
 
 from .base import *  # noqa
 from .base import env
-
 
 # GENERAL
 # ------------------------------------------------------------------------------
@@ -79,6 +80,12 @@ CLOUDINARY_KEY = env("CLOUDINARY_KEY", default="")
 CLOUDINARY_SECRET = env("CLOUDINARY_SECRET", default="")
 CLOUDINARY_NAME = env("CLOUDINARY_NAME", default="")
 
+cloudinary.config(
+    cloud_name=CLOUDINARY_NAME,
+    api_key=CLOUDINARY_KEY,
+    api_secret=CLOUDINARY_SECRET,
+)
+
 CLOUDINARY_STORAGE = {
     "CLOUD_NAME": CLOUDINARY_NAME,
     "API_SECRET": CLOUDINARY_SECRET,
@@ -93,7 +100,7 @@ STORAGES = {
     "staticfiles": {
         # Leave whatever setting you already have here, e.g.:
         # "BACKEND": "django.contrib.staticfiles.storage.StaticFilesStorage",
-        "BACKEND": 'whitenoise.storage.CompressedManifestStaticFilesStorage',
+        "BACKEND": "whitenoise.storage.CompressedManifestStaticFilesStorage",
     },
 }
 
@@ -112,7 +119,8 @@ TEMPLATES[-1]["OPTIONS"]["loaders"] = [  # type: ignore[index] # noqa F405
 
 # EMAIL
 # ------------------------------------------------------------------------------
-DEFAULT_FROM_EMAIL = env("DJANGO_DEFAULT_FROM_EMAIL", default="no-repy@django.co")
+DEFAULT_FROM_EMAIL = env("FROM_EMAIL", default="no-repy@django.co")
+FROM_EMAIL = env("FROM_EMAIL", default="no-repy@django.co")
 SERVER_EMAIL = env("DJANGO_SERVER_EMAIL", default=DEFAULT_FROM_EMAIL)
 EMAIL_SUBJECT_PREFIX = env(
     "DJANGO_EMAIL_SUBJECT_PREFIX",
