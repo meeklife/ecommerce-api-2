@@ -36,6 +36,13 @@ class OrderViewSet(ModelViewSet):
             return Response(
                 {"detail": "Cart is empty"}, status=status.HTTP_400_BAD_REQUEST
             )
+
+        shopping_items = cart.items.count()
+        if shopping_items == 0:
+            return Response(
+                {"detail": "Add items to cart"}, status=status.HTTP_400_BAD_REQUEST
+            )
+
         cart_items = CartItem.objects.filter(cart=cart.id).prefetch_related("product")
 
         total_amount = sum(item.product.price * item.quantity for item in cart_items)

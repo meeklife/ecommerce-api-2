@@ -1,3 +1,4 @@
+from cloudinary.models import CloudinaryField
 from django.contrib.auth.models import (
     AbstractBaseUser,
     BaseUserManager,
@@ -123,7 +124,8 @@ class Profile(base_models.BaseModel):
     gender = models.CharField(max_length=2, choices=Gender.choices)
     dob = models.DateField(null=True, blank=True)
     phone_number = models.CharField(max_length=25, blank=True)
-    profile_image = models.ImageField(upload_to="profile", blank=True, null=True)
+    # profile_image = models.ImageField(upload_to="profile", blank=True, null=True)
+    profile_image = CloudinaryField("image", blank=True, null=True)
     referral_points = models.PositiveIntegerField(default=0)
     referral_code = models.CharField(max_length=254, blank=True, null=True)
     referrer = models.ForeignKey(
