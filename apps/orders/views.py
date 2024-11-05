@@ -130,9 +130,10 @@ class OrderViewSet(ModelViewSet):
                     if user_profile:
                         try:
                             referrer = user_profile.referrer
+                            if referrer:
+                                referrer.profile.update_referral(+5)
+                                referrer.save()
 
-                            referrer.profile.update_referral(+5)
-                            referrer.save()
                         except Profile.DoesNotExist:
                             pass
 
