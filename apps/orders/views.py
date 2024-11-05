@@ -1,7 +1,6 @@
 from django.db import transaction
 from django.shortcuts import get_object_or_404
-
-# from django.urls import reverse
+from django.urls import reverse
 from rest_framework import status
 from rest_framework.decorators import action
 from rest_framework.response import Response
@@ -74,11 +73,7 @@ class OrderViewSet(ModelViewSet):
         serializer = self.get_serializer(order)  # noqa
 
         kobo_amount = int(total_cost * 100)
-        # callback_url = request.build_absolute_uri(reverse("payment_verify"))
-        callback_url = request.build_absolute_uri(
-            "http://127.0.0.1:8000/api/order/payment/verify/"
-        )
-        # callback_url = reverse("payment_verify")
+        callback_url = request.build_absolute_uri(reverse("api:order:payment_verify"))
 
         payment_response = PaystackUtils.initialize_transaction(
             amount=kobo_amount,
