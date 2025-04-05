@@ -37,7 +37,7 @@ SECRET_KEY = env(
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = False
 
-ALLOWED_HOSTS = ["*.onrender.com"]
+ALLOWED_HOSTS = ["ecommerce-api-2-7xbm.onrender.com"]
 
 
 # Application definition
