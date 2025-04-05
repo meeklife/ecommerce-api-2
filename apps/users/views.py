@@ -10,8 +10,9 @@ from rest_framework.permissions import AllowAny, IsAdminUser, IsAuthenticated
 from rest_framework.response import Response
 from rest_framework.views import APIView
 from rest_framework.viewsets import GenericViewSet, ModelViewSet
+import logging
 
-from apps.common.email import send_email
+from apps.common.email import send_email, send_email_template
 from apps.common.utils import OTPUtils
 
 from .models import Address, Profile, Role
@@ -191,11 +192,16 @@ class EmailVerification(APIView):
         code, _ = OTPUtils.generate_otp(user)
 
         recipient = user.email
-        subject = "Email Verification Code"
-        message = f"Your email verification code is {code}"
+        # subject = "Email Verification Code"
+        # message = f"Your email verification code is {code}"
 
         if not user.is_verified:
-            send_email(subject, message, recipient)
-            return Response("Email Verification Code sent successfully")
+            # send_email(subject, message, recipient)
+            # return Response("Email Verification Code sent successfully")
+            try:
+                send_email_template(recipient, "d-491be22360794a6782913ffb274e9224", {recipient: {"code": code}})
+
+            except Exception as e:
+                logging.error(f"Error sending email verification OTP: {e}")
 
         return Response("Email already verified")
