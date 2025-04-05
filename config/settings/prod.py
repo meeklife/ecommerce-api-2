@@ -140,8 +140,6 @@ EMAIL_BACKEND = env(
 )
 ANYMAIL = {
     "SENDGRID_API_KEY": env("SENDGRID_API_KEY", default=""),
-    "SENDGRID_GENERATE_MESSAGE_ID": env("SENDGRID_GENERATE_MESSAGE_ID", default=""),
-    "SENDGRID_MERGE_FIELD_FORMAT": env("SENDGRID_MERGE_FIELD_FORMAT", default=""),
     "SENDGRID_API_URL": env("SENDGRID_API_URL", default="https://api.sendgrid.com/v3/"),
 }
 

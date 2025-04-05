@@ -191,9 +191,11 @@ class EmailVerification(APIView):
         code, _ = OTPUtils.generate_otp(user)
 
         recipient = user.email
-
         subject = "Email Verification Code"
         message = f"Your email verification code is {code}"
 
-        send_email(subject, message, recipient)
-        return Response("OK")
+        if not user.is_verified:
+            send_email(subject, message, recipient)
+            return Response("Email Verification Code sent successfully")
+
+        return Response("Email already verified")
