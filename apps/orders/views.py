@@ -113,6 +113,7 @@ class OrderViewSet(ModelViewSet):
             if response["data"]["status"] == "success":
                 order = get_object_or_404(Order, id=reference)
                 order.status = "PC"
+                order.ordered = True
                 order.save()
 
                 Transaction.objects.create(

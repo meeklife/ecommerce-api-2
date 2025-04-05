@@ -5,7 +5,7 @@ from rest_framework import status
 from rest_framework.decorators import action
 from rest_framework.generics import CreateAPIView
 from rest_framework.mixins import ListModelMixin, RetrieveModelMixin, UpdateModelMixin
-from rest_framework.parsers import FormParser, MultiPartParser
+from rest_framework.parsers import FormParser, MultiPartParser, JSONParser
 from rest_framework.permissions import AllowAny, IsAdminUser, IsAuthenticated
 from rest_framework.response import Response
 from rest_framework.views import APIView
@@ -154,7 +154,7 @@ class ProfileView(ModelViewSet):
     queryset = Profile.objects.all().prefetch_related("user", "role")
     serializer_class = ProfileSerializer
     filterset_fields = ("user", "role")
-    parser_classes = (FormParser, MultiPartParser)
+    parser_classes = (FormParser, MultiPartParser, JSONParser)
 
     http_method_names = [m for m in ModelViewSet.http_method_names if m not in ["put"]]
 
@@ -191,9 +191,11 @@ class EmailVerification(APIView):
         code, _ = OTPUtils.generate_otp(user)
 
         recipient = user.email
-
         subject = "Email Verification Code"
         message = f"Your email verification code is {code}"
 
-        send_email(subject, message, recipient)
-        return Response("OK")
+        if not user.is_verified:
+            send_email(subject, message, recipient)
+            return Response("Email Verification Code sent successfully")
+
+        return Response("Email already verified")
